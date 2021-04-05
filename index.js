@@ -1,10 +1,9 @@
-const express = require('express');
-const path = require('path');
-const https = require('https');
-const fs = require('fs');
-const cookieParser = require('cookie-parser');
-const { validateToken } = require('authentication');
 require('dotenv').config();
+const path = require('path');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const { sslRedirect } = require('./ssl');
+const { validateToken } = require('./authentication');
 
 const app = express();
 
@@ -13,6 +12,10 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+
+if(process.env.NODE_ENV === "production")
+    app.use(sslRedirect());
+    
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -35,32 +38,7 @@ app.post('/login', (req, res) => {
     return res.status(400).end();
 });
 
-function startSecureServer() {
-    var options = {
-        key: fs.readFileSync(process.env.KEY_PATH),
-        cert: fs.readFileSync(process.env.CERT_PATH),
-        passphrase: process.env.PASSPHRASE
-    };
-    var server = https.createServer(options, app);
-    server.listen(process.env.HTTPS_PORT, () => {
-        console.log('HTTPS Control Board started.');
-    });
-
-    var http = express();
-    http.get('*', function(req, res) {
-        res.redirect('https://' + req.headers.host + req.url);
-    });
-    http.listen(process.env.HTTP_PORT);
-}
-
-function startServer() {
-    app.listen(process.env.HTTP_PORT, () => {
-        console.log('HTTP Control Board started.');
-    });
-}
-
-if(process.env.SECURE && process.env.SECURE === 1)
-    startSecureServer();
-else
-    startServer();
+app.listen(process.env.PORT, () => {
+    console.log('Control Board started.');
+});
 

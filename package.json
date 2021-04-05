@@ -5,17 +5,16 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:docker": "docker build -t mncscontrolboard:dev -f ../Dockerfile.controlboard ..",
-    "start": "yarn compile && nodemon index.js",
-    "start:prod": "yarn compile && node index.js",
-    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev",
-    "compile": "cd node_modules/.bin && sass ../../scss/main.scss ../../public/css/main.css && uglifycss ../../public/css/main.css > ../../public/css/main.min.css && sass ../../scss/index.scss ../../public/css/index.css && uglifycss ../../public/css/index.css > ../../public/css/index.min.css"
+    "build": "sass scss/main.scss public/css/main.css && uglifycss public/css/main.css > public/css/main.min.css && sass scss/index.scss public/css/index.css && uglifycss public/css/index.css > public/css/index.min.css",
+    "build:docker": "docker build -t mncscontrolboard:dev -f ./Dockerfile .",
+    "start": "node index.js",
+    "start:dev": "yarn build && nodemon index.js",
+    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "authentication": "file:..\\Authentication\\",
     "chart.js": "^2.9.4",
     "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
@@ -23,7 +22,6 @@
     "express": "^4.17.1",
     "sass": "^1.32.6",
     "socket.io-client": "^4.0.1",
-    "uglify-js": "^3.12.6",
     "uglifycss": "0.0.29"
   },
   "devDependencies": {
