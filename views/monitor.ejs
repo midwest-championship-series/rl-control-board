@@ -1,0 +1,40 @@
+<!-- We should not be putting <style> here, but we are >:)  (temporarily) -->
+<style>
+    .twitch {
+        border-radius: 10px;
+    }
+    #monitor-container {
+        display: flex;
+        flex-flow: row wrap;
+        margin-left: 40px;
+    }
+</style>
+
+<p>Monitor</p>
+
+<div id="monitor-container">
+    <div class="panel-2 panel-float" style="background-color: #0000;">
+        <iframe class="twitch" src="https://player.twitch.tv/?channel=mnchampionshipseries&parent=localhost&muted=true" height="610" width="1000" allowfullscreen="true"></iframe>
+    </div>
+    
+    <div class="panel panel-float" style="background-color: #0000;">
+        <iframe class="twitch" src="https://www.twitch.tv/embed/mnchampionshipseries/chat?darkpopout&parent=localhost" height="610" width="480"></iframe>
+    </div>
+
+    <!-- Fill in the rest of these with sumthin, like graphs n shiet, stats perhaps, but failure, yes failure as well -->
+    <div class="panel panel-float panel-pad">
+        <div>
+            
+        </div>
+    </div>
+    <div class="panel panel-float panel-pad">
+        <div>
+            
+        </div>
+    </div>
+    <div class="panel panel-float panel-pad">
+        <div>
+            <p>bruv at least put a graph here chez</p>
+        </div>
+    </div>
+</div>

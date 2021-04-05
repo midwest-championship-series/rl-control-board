@@ -1,0 +1,311 @@
+<html>
+    <head>
+        <title>MNCS Overlay</title>
+        <link rel="stylesheet" href="bootstrap.min.css">
+        <style>
+            .overlay {
+                width: 100%;
+                height: 100%;
+                border: none;
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                background-color: rgba(0, 0, 0, 0);
+                margin: 0px auto;
+                overflow: hidden;
+            }
+            .popup {
+                width: 350px;
+                height: 75px;
+                margin: 20px;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 5px 5px 5px #222;
+                -webkit-transition: background-color 0.5s ease-in-out;
+                -moz-transition: background-color 0.5s ease-in-out;
+                -o-transition: background-color 0.5s ease-in-out;
+                -khtml-transition: background-color 0.5s ease-in-out;
+                transition: background-color 0.5s ease-in-out;
+            }
+            #BOOOOOOOOOOOOOOOOOOST {
+                width: 260px;
+                height: 260px;
+                border: none;
+                bottom:0px;
+                right:0px;
+                z-index: 9;
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0);
+                margin: 0px auto;
+                overflow: hidden;
+
+                -ms-transform: scale(0.8);
+                -moz-transform: scale(0.8);
+                -o-transform: scale(0.8);
+                -webkit-transform: scale(0.8);
+                transform: scale(0.8);
+
+                -ms-transform-origin: 0 0;
+                -moz-transform-origin: 0 0;
+                -o-transform-origin: 0 0;
+                -webkit-transform-origin: 0 0;
+                transform-origin: 0 0;
+            }
+            .popup p {
+                margin: 0;
+            }
+            #transition {
+                z-index:10;
+            }
+
+            #match-details-screen, #replay-screen {
+                z-index:1;
+            }
+
+            #pre-game-screen, #post-game-screen, #technical-pause-screen {
+                z-index: 8;
+                background-color: black;
+                color: white;
+            }
+            .montserrat-bold {
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 900;
+                color: white;
+            }
+        </style>
+        <script src="jquery.js"></script>
+        <script src="ws_subscribers.js"></script>
+        <script src="animate.js"></script>
+    </head>
+    <body>
+
+        <video class="overlay" id="transition" muted="muted">
+            <source src="img/transition.webm" type="video/webm">
+        </video>
+
+        <% scenes.forEach((entry) => { %>
+            <%- include('../public/overlay/' + entry + '/overlay.html'); %>
+        <% }); %>
+
+        
+        <iframe id="match-details-screen" class="overlay" src="./Overlays/MatchScreen/overlay.html" style="opacity: 0;"></iframe>
+        <iframe id="replay-screen" class="overlay" src="./Overlays/ReplayScreen/overlay.html" style="opacity: 1;"></iframe>
+        <iframe id="pre-game-screen" class="overlay" src="./Overlays/PreGameScreen/overlay.html" style="opacity: 0;"></iframe>
+        <iframe id="BOOOOOOOOOOOOOOOOOOST"  scrolling="no" frameborder="0" allowtransparency="true" src="./Overlays/MatchScreen/boost.html"></iframe>
+        
+        <script>
+
+			var transitioning = false;
+			
+            function transition(speed) {
+                document.querySelector('#transition').playbackRate = speed;
+                document.querySelector('#transition').play();
+            }
+
+            function hideAllScenes() {
+                document.querySelectorAll('.component').forEach((entry) => {
+                    entry.style.opacity = "0";
+                });
+            }
+
+            function getCurrentScene() {
+                let toRet = "";
+                document.querySelectorAll('.component').forEach((entry) => {
+                    if(entry.style.opacity === "1")
+                        toRet = entry.getAttribute("scene");
+                });
+                return toRet;
+            }
+
+            function connectToRelay() {
+                if(!WsSubscribers.webSocketConnected){
+                    WsSubscribers.init(49322, false);
+                    
+                    setTimeout(function() {
+                        if(WsSubscribers.webSocket.readyState === 3) {
+                            connectToRelay();
+                        }
+                    }, 4000);
+                }
+            }
+
+            function connectToControlBoard() {
+                if(!ControlBoard.webSocketConnected){
+                    ControlBoard.init();
+
+                    setTimeout(function() {
+                        if(!ControlBoard.webSocket.readyState === 3) {
+                            connectToControlBoard();
+                        }
+                    }, 4000);
+                }
+            }
+
+            function switchScene(scene, transition){
+				if(transitioning === false){
+					transitioning = true;
+					if(transition){
+						ControlBoard.webSocket.send(JSON.stringify({'event_name': 'begin_transition'}));
+						document.querySelector('video').playbackRate = 1.3;
+						document.querySelector('video').play();
+						setTimeout(function() {
+							ControlBoard.webSocket.send(JSON.stringify({'event_name': 'scene_change', 'from': getCurrentScene(), 'to': scene}));
+							hideAllScenes();
+
+                            document.querySelectorAll('.component').forEach((entry) => {
+                                if(entry.getAttribute("scene") === scene)
+                                    entry.style.opacity = "1";
+                            });
+						}, 500);
+						setTimeout(function() {
+							transitioning = false;
+						}, 1000);
+					} else {
+						console.log(getCurrentScene());
+						ControlBoard.webSocket.send(JSON.stringify({'event_name': 'scene_change', 'from': getCurrentScene(), 'to': scene}));
+						hideAllScenes();
+						document.querySelectorAll('.component').forEach((entry) => {
+                            if(entry.getAttribute("scene") === scene)
+                                entry.style.opacity = "1";
+                        });
+						transitioning = false;
+					}   
+				}
+            }
+
+            $(() => {
+                ControlBoard.subscribe("controlboard", "switch_scene", (d) => {
+                    switchScene(d['scene'], d['transition']);
+                });
+                ControlBoard.subscribe("ws", "open", (d) => {
+                    document.querySelector('video').addEventListener('ended', (event) => {
+                        ControlBoard.webSocket.send(JSON.stringify({'event_name': 'end_transition'}));
+                    });
+                });
+                ControlBoard.subscribe("ws", "close", (d) => {
+                    setTimeout(function() {
+                        connectToControlBoard();
+                    }, 3000);
+                });
+                WsSubscribers.subscribe("ws", "close", (d) => {
+                    setTimeout(function() {
+                        connectToRelay();
+                    }, 3000);
+                });
+                WsSubscribers.subscribe("mncs", "reset", (d) => {
+                    ControlBoard.webSocket.send(JSON.stringify({'event_name': 'reset'}));
+                    document.querySelectorAll('.component').forEach((entry) => {
+                        entry.style.opacity = "0";
+                        if(entry.getAttribute("default") === "true")
+                            switchScene(entry.getAttribute("scene"), false);
+                    });
+                    matchEnd = false;
+                    teamSize = 6;
+                });
+            });
+
+        </script>
+        <script>
+
+            $(() => {
+
+                connectToControlBoard();
+
+                var teamSize = 6;
+                var matchEnd = false;
+
+                ControlBoard.subscribe("ws", "open", (d) => {
+                    document.getElementById('controlboard-connecting').style.display = "none";
+                    document.getElementById('controlboard-status').innerText = "Control Board Connected!";
+                    document.getElementById('controlboard-div').style.backgroundColor = "#4CDB81";
+                });
+                ControlBoard.subscribe("ws", "close", (d) => {
+                    document.getElementById('controlboard-connecting').style.display = "block";
+                    document.getElementById('controlboard-status').innerText = "Control Board disconnected.";
+                    document.getElementById('controlboard-div').style.backgroundColor = "#BC3232";
+                });
+                WsSubscribers.subscribe("mncs", "reset", (d) => {
+                    matchEnd = false;
+                    teamSize = 6;
+                });
+                WsSubscribers.subscribe("ws", "open", (d) => {
+                    document.getElementById('plugin-connecting').style.display = "none";
+                    document.getElementById('plugin-status').innerText = "Relay Connected!";
+                    document.getElementById('plugin-div').style.backgroundColor = "#4CDB81";
+                });
+                WsSubscribers.subscribe("ws", "close", (d) => {
+                    document.getElementById('plugin-connecting').style.display = "block";
+                    document.getElementById('plugin-status').innerText = "Relay disconnected.";
+                    document.getElementById('plugin-div').style.backgroundColor = "#BC3232";
+                });
+                WsSubscribers.subscribe("game", "match_created", (d) => {
+                    // match created, setup pre-match screen
+                    //document.querySelector('#pre-game-screen').style.opacity = "1";
+                });
+                WsSubscribers.subscribe("game", "goal_scored", (d) => {
+                    // transition into replay
+                    setTimeout(function() {
+                        transition(1.4);
+                    }, 2000);
+                });
+                WsSubscribers.subscribe("game", "player_join", (d) => {
+                    if(d['players'] && Object.keys(d['players']) && Object.keys(d['players']).length === teamSize * 2 && (document.querySelector("#pre-game-screen").style.opacity === "1" || document.querySelector("#post-game-screen").style.opacity === "1" || document.querySelector("#technical-pause-screen").style.opacity === "1")){
+                        switchScene('MATCH', true);
+                    }
+                });
+                WsSubscribers.subscribe("mncs", "match_prepare", (d) => {
+                    if(autoTransition === true){
+                        switchScene('PRE_GAME', true);
+                    }
+                })
+                WsSubscribers.subscribe("mncs", "game_ended", (d) => {
+                    console.log(d);
+                })
+                WsSubscribers.subscribe("mncs", "match_complete", (d) => {
+                    // no args, mncs:update_state gets sent right before this
+                    console.log('MNCS Match Ended!');
+
+                    // Check for the next leave match event and transition to the pregame screen then.
+                    matchEnd = true;
+                });
+                WsSubscribers.subscribe("mncs", "technical_pause", (d) => {
+                    if(!(document.querySelector('#post-game-screen').style.opacity === "1" && !matchEnd)) {
+                        // do NOT transition to a technical pause if the post game screen is showing and the match hasn't ended. leave the post-game screen up.
+                        if(matchEnd){
+                            // RESET TIME!!!!!!!!!
+                            document.getElementById('match-details-screen').src += "";
+                            document.getElementById('replay-screen').src += "";
+                            if(autoTransition === true){
+                                document.getElementById('pre-game-screen').style.opacity = "0";
+                                document.getElementById('post-game-screen').style.opacity = "0";
+                                document.getElementById('technical-pause-screen').style.opacity = "0";
+                                switchScene('WAITING', false);
+                            }
+                            matchEnd = false;
+                        } else {
+                            if(document.getElementById('pre-game-screen').style.opacity !== "1"){
+                                // Don't display technical pause if the pre-game screen is up
+                                console.log("Technical Pause!");
+                                if(document.querySelector('#technical-pause-screen').style.opacity !== "1"){
+                                    // there's no point in transitioning from the technical pause to the technical pause. like wtf. wtF CHEYYZ
+                                    if(autoTransition === true){
+                                        switchScene('TECHNICAL_PAUSE', true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                WsSubscribers.subscribe("mncs", "update_state", (d) => {
+                    // use for post-game screen?
+                    console.log(d);
+                    teamSize = d['match']['team_size'];
+                });
+                connectToRelay();
+            });
+        </script>
+    </body>
+</html>

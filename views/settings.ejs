@@ -1,0 +1,95 @@
+<style>
+    #settings-container {
+        margin-left: 30px;
+    }
+    .team-logo {
+        display: inline-block;
+        max-width: 60px;
+    }
+    .team-name {
+        display: inline-block;
+    }
+    #teams-list li {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    #teams-list button {
+        align-self: center;
+    }
+</style>
+
+<p>Settings (Teams & Servers)</p>
+
+<!--
+    
+-->
+<div id="settings-container">
+    <div>
+        <h3 style="display: inline-block;margin-bottom: 0px;">Teams</h3>
+        <button style="margin-left: 15px;display: inline-block;font-size:15px;text-transform:none;" class="uk-button uk-button-text" uk-toggle="target: #add-team-modal">+ Add New Team</button>
+    </div>
+    <button style="margin-top:5px;" class="uk-button uk-button-primary uk-button-small" onclick="setRefreshTeams()">Refresh</button>
+    <ul class="uk-list uk-list-striped" id="teams-list" style="max-width: 500px;border: solid 2px #09f;"></ul>
+</div>
+<%- include('./modals/add_team.ejs'); %>
+
+<script>
+
+let sCurTeamList = [];
+function setUpdateTeamsList(teams) {
+    document.getElementById("teams-list").innerHTML = "";
+    teams.forEach((entry) => {
+        let uid = generateUUID();
+        let teamHtml = '<li id="'+uid+'"><img class="team-logo" src="'+entry.avatar+'" /><p class="team-name">' + entry.name + (entry.isOfficial ? " (API)" : "") + '</p><button class="uk-button uk-button-danger" '+(entry.isOfficial ? 'style="background-color: #f0506344 !important;cursor: default !important;" disabled' : 'onclick="Relay.socket.emit(\'remove team\', \''+entry.name+'\', (err, reply) => {})')+'">Remove</button></li>';
+        document.getElementById("teams-list").innerHTML += teamHtml;
+    });
+}
+
+function setRefreshTeams() {
+    Teams.refresh((teams, err) => {
+        if(err)
+            console.log(err);
+        else
+            setUpdateTeamsList(teams);
+    });
+}
+
+ServerManager.addListener("status_changed", (data) => {
+    if(data["status"] === "CONNECTED") {
+
+        Relay.socket.emit("get teams", (teams, err) => {
+            if(!err) {
+                sCurTeamList = teams;
+                setUpdateTeamsList(teams);
+            } else
+                console.log(err);
+        });
+
+        Relay.socket.on("teams refreshed", (teams) => {
+            sendNotification("Teams refreshed");
+            setUpdateTeamsList(teams);
+            sCurTeamList = teams;
+        });
+
+        Relay.socket.on("team removed", (name) => {
+            sendNotification("Team removed ("+name+")");
+            sCurTeamList = sCurTeamList.filter(x => x.name !== name);
+            setUpdateTeamsList(sCurTeamList);
+        });
+
+        Relay.socket.on("team added", (team) => {
+            sendNotification("Team added ("+team.name+")");
+            sCurTeamList.push(team);
+            setUpdateTeamsList(sCurTeamList);
+        });
+
+        Relay.socket.on("team updated", (name, team) => {
+            sendNotification("Team updated ("+name+")");
+            sCurTeamList = sCurTeamList.filter(x => x.name !== name);
+            sCurTeamList.push(team);
+            setUpdateTeamsList(sCurTeamList);
+        });
+    }
+});
+</script>

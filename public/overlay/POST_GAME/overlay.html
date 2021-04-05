@@ -1,0 +1,361 @@
+<style>
+    p {
+        padding: 0;
+        margin: 0;
+    }
+    #post-game-screen {
+        background-color: rgba(0,0,0,0);
+        position: absolute;
+        width: 1920px;
+        height: 1080px;
+        z-index: 1;
+    }
+    #background {
+        position: absolute;
+        width: 1920px;
+        height: 1080px;
+        z-index: -1;
+    }
+    .team-logo {
+        max-width: 205px;
+        max-height: 205px;
+        align-self: center;
+    }
+    .col-md-auto {
+        padding: 0 !important;
+    }
+    .montserrat-bold {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+    }
+    .montserrat {
+        font-family: 'Montserrat', sans-serif;
+    }
+    .series-score-active {
+        background-color: yellow;
+        min-height: 8px;
+        margin-left: 8px;
+        margin-right: 8px; 
+        width: 50px !important;
+        box-shadow: 0 0 5px 2px yellow;
+    }
+    .series-score-inactive {
+        background-color: rgb(126, 98, 6);
+        min-height: 8px;
+        margin-left: 8px;
+        margin-right: 8px; 
+        width: 50px !important;
+        box-shadow: 0px 0px 15px rgb(212, 163, 3) inset;
+    }
+    .player {
+        height: 65px;
+    }
+    .player-name {
+        padding-left: 75px;
+        padding-top: 7px;
+        line-height: 65px;
+        height: 65px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bolder;
+        font-size: 30px !important;
+        text-transform: uppercase;
+        color: white;
+        background:linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 5.4%, rgba(138, 19, 185, 1) 5.4%, rgba(138, 19, 185, 1) 9%, rgba(30,30,30,0.5) 10%, rgba(30,30,30,0.5) 96.7%, rgba(0,0,0,0) 96.7%, rgba(0,0,0,0) 100%);
+        
+    }
+    .col > p {
+        color: white;
+        font-size: 40px;
+        font-family: 'Montserrat', sans-serif;
+    }
+    .player-row {
+        margin-bottom: 20px;
+    }
+</style>
+
+
+<div id="post-game-screen" scene="POST_GAME" class="component container" style="display: block;opacity:0;">
+    <p id="match-point" class="montserrat" style="font-size: 80px;position: absolute; left:675px; top:300px;z-index: 10;text-shadow: 2px 2px 6px #000;">MATCH POINT</p>
+    <div class="row" style="width:1920px; height:1080px;">
+        <div class="col" style="display: flex; flex-direction: column;justify-content: center;align-items: center;">
+            <!-- winning team -->
+            <p class="montserrat" id="wteam-name" style="font-size: 50px;color: black;text-shadow: 1px 1px 5px #000;">Minneapolis Miracles</p>
+            
+            <div class="row" id="wteam-series" style="margin-top:5px;margin-bottom: 40px;">
+                <div class="col series-score-active" style="margin-left: 0px;"></div>
+                <div class="col series-score-active"></div>
+                <div class="col series-score-active"></div>
+                <div class="col series-score-inactive"></div>
+            </div>
+
+            <div id="wteam-players">
+                <div class="row player-row" style="width: 600px;">
+                    <div class="wteam-player col">
+                        <p id="wteam-player-1-name" class="player-name">WILDCAT</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col wteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="wteam-player-1-goals" style="margin-left:40px;">4</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-1-assists" >2</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-1-saves" >13</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-1-shots" >15</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+                
+                <div class="row player-row" style="width: 600px;">
+                    <div class="wteam-player col">
+                        <p id="wteam-player-2-name" class="player-name">DELEPHANT</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col wteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="wteam-player-2-goals" style="margin-left:40px;">33</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-2-assists" >33</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-2-saves" >33</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-2-shots" >33</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+                
+                <div class="row player-row" style="width: 600px;">
+                    <div class="wteam-player col">
+                        <p id="wteam-player-3-name" class="player-name">LUCID</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col wteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="wteam-player-3-goals" style="margin-left:40px;">0</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-3-assists" >0</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-3-saves" >0</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="wteam-player-3-shots" >0</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-auto" style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+            <img id="wteam-logo" class="team-logo" src="" style="filter: drop-shadow(0 0 1.25rem yellow);" />
+            <p id="game-score" class="montserrat-bold" style="padding-left:30px;padding-right:30px;font-size: 90px;">6 - 0</p>
+            <img id="lteam-logo" class="team-logo" src="" style="filter: drop-shadow(0 0 1.25rem red);" />
+        </div>
+        <div class="col" style="display: flex; flex-direction: column;justify-content: center;align-items: center;">
+            <!-- losing team -->
+            <p id='lteam-name' class="montserrat" style="font-size: 50px;color: black;text-shadow: 1px 1px 5px #000;">Rochester Rhythm</p>
+            
+            <div class="row" id="lteam-series" style="margin-top:5px;margin-bottom: 40px;">
+                <div class="col series-score-active"></div>
+                <div class="col series-score-inactive"></div>
+                <div class="col series-score-inactive"></div>
+                <div class="col series-score-inactive"></div>
+            </div>
+
+            <div id="lteam-players">
+                <div class="row player-row" style="width: 600px;">
+                    <div class="lteam-player col">
+                        <p id="lteam-player-1-name" class="player-name">ZBRUH</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col lteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="lteam-player-1-goals" style="margin-left:40px;">33</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-1-assists" >33</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-1-saves" >14</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-1-shots" >17</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+                
+                <div class="row player-row" style="width: 600px;">
+                    <div class="lteam-player col">
+                        <p id="lteam-player-2-name" class="player-name">NORTH*</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col lteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="lteam-player-2-goals" style="margin-left:40px;">0</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-2-assists" >0</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-2-saves" >0</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-2-shots" >0</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+                
+                <div class="row player-row" style="width: 600px;">
+                    <div class="lteam-player col">
+                        <p id="lteam-player-3-name" class="player-name">!NATHAN</p>
+                    </div>
+                    <div class="w-100"></div>
+                    <div class="col lteam" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba(138, 19, 185, 1) 0%, rgba(138, 19, 185, 1) 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">
+                        <p id="lteam-player-3-goals" style="margin-left:40px;">0</p>
+                        <img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-3-assists" >0</p>
+                        <img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-3-saves" >0</p>
+                        <img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                        <p id="lteam-player-3-shots" >0</p>
+                        <img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <video id="background" loop muted="muted" autoplay>
+        <source src="./img/post-game-screen.webm" type="video/webm">
+    </video>
+</div>
+
+
+<script>
+    function readFile(file, callback) {
+        var rawFile = new XMLHttpRequest();
+        rawFile.overrideMimeType("application/json");
+        rawFile.open("GET", file, true);
+        rawFile.onreadystatechange = function() {
+            if (rawFile.readyState === 4 && rawFile.status == "200") {
+                callback(rawFile.responseText);
+            }
+        }
+        rawFile.send(null);
+    }
+    function hexToRgb(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function getPlayerHTML(player_name, team_color, goals, assists, saves, shots) {
+        var html = '<div class="row player-row" style="width: 600px;">';
+                html += '<div class="col player" style="">';
+                    html += '<p class="player-name" style="background: linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 5.4%, rgba('+team_color.r+', '+team_color.g+', '+team_color.b+', 1) 5.4%, rgba('+team_color.r+', '+team_color.g+', '+team_color.b+', 1) 9%, rgba(30,30,30,0.5) 9%, rgba(30,30,30,0.5) 96.7%, rgba(0,0,0,0) 96.7%, rgba(0,0,0,0) 100%);">'+player_name+'</p>';
+                html += '</div>';
+                html += '<div class="w-100"></div>';
+                html += '<div class="col" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, rgba('+team_color.r+', '+team_color.g+', '+team_color.b+', 1) 0%, rgba('+team_color.r+', '+team_color.g+', '+team_color.b+', 1) 4%, rgba(30,30,30,0.5) 4%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">';
+                    html += '<p style="margin-left:40px;">'+goals+'</p>';
+                    html += '<img src="./img/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+assists+'</p>';
+                    html += '<img src="./img/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+saves+'</p>';
+                    html += '<img src="./img/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+shots+'</p>';
+                    html += '<img src="./img/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />';
+                html += '</div>';
+            html += '</div>';
+            return html;
+    }
+
+    var wteam = "";
+    var lteam = "";
+
+    $(() => {
+        WsSubscribers.subscribe("game", "match_ended", (d) => {
+            setTimeout(function() {
+                switchScene('POST_GAME', true);
+            }, 7000);
+        });
+        WsSubscribers.subscribe("mncs", "game_ended", (d) => {
+            // provides game score & player stats
+            console.log("mncs:game_ended");
+
+            wteam = (d['game']['teams'][0]['name'] === d['game']['winner'] ? "blue" : "orange");
+            lteam = wteam === "blue" ? "orange" : "blue";
+
+            document.getElementById("wteam-name").innerText = d['match']['teams'][wteam]['name'];
+            document.getElementById("lteam-name").innerText = d['match']['teams'][lteam]['name'];
+
+            document.getElementById("wteam-logo").src = d['match']['teams'][wteam]['logo'];
+            document.getElementById("lteam-logo").src = d['match']['teams'][lteam]['logo'];
+
+            document.getElementById('wteam-series').innerHTML = "";
+            document.getElementById('lteam-series').innerHTML = "";
+            for(var i = 1; i <= d['match']['score_to_win']; i++){
+                if(d['match']['teams'][wteam]['score'] >= i) {
+                    document.getElementById('wteam-series').innerHTML += '<div class="col series-score-active"></div>';
+                } else {
+                    document.getElementById('wteam-series').innerHTML += '<div class="col series-score-inactive"></div>';
+                }
+                if(d['match']['teams'][lteam]['score'] >= i) {
+                    document.getElementById('lteam-series').innerHTML += '<div class="col series-score-active"></div>';
+                } else {
+                    document.getElementById('lteam-series').innerHTML += '<div class="col series-score-inactive"></div>';
+                }
+            }
+
+            document.getElementById('match-point').style.display = "none";
+            if(d['match']['score_to_win'] - 1 === d['match']['teams'][wteam]['score']) {
+                document.getElementById('match-point').style.display = "block";
+            }
+            
+            if(d['match']['score_to_win'] - 1 === d['match']['teams'][lteam]['score']) {
+                document.getElementById('match-point').style.display = "block";
+            }
+            if(d['match']['score_to_win'] === d['match']['teams'][lteam]['score'] || d['match']['score_to_win'] === d['match']['teams'][wteam]['score']) {
+                document.getElementById('match-point').style.display = "none";
+            }
+
+            document.getElementById("game-score").innerText = d['game']['teams'][(wteam === "blue" ? 0 : 1)]['score'] + " - " + d['game']['teams'][(lteam === "blue" ? 0 : 1)]['score'];
+
+            var wteamColor = "#ff9900";
+            var lteamColor = "#0099FF";
+
+            // REPLACE THIS
+            readFile("https://chezy.dev/mncs/colors.json", (str) => {
+                var json = JSON.parse(str);
+                console.log(json);
+                wteamColor = json[d['match']['teams'][wteam]['name']]["home_primary"];
+                lteamColor = json[d['match']['teams'][lteam]['name']]["home_primary"];
+                document.getElementById('wteam-players').innerHTML = "";
+                document.getElementById('lteam-players').innerHTML = "";
+                Object.keys(d['players']).forEach(function(entry) {
+                    var player = d['players'][entry];
+                    if(player['team'] === (wteam === "blue" ? 0 : 1)) {
+                        document.getElementById('wteam-players').innerHTML += getPlayerHTML(player['name'], hexToRgb(wteamColor), player['goals'], player['assists'], player['saves'], player['shots']);
+                    } else {
+                        document.getElementById('lteam-players').innerHTML += getPlayerHTML(player['name'], hexToRgb(lteamColor), player['goals'], player['assists'], player['saves'], player['shots']);
+                    }
+                });
+            });
+            
+            document.getElementById('wteam-players').innerHTML = "";
+            document.getElementById('lteam-players').innerHTML = "";
+            Object.keys(d['players']).forEach(function(entry) {
+                var player = d['players'][entry];
+                if(player['team'] === (wteam === "blue" ? 0 : 1)) {
+                    document.getElementById('wteam-players').innerHTML += getPlayerHTML(player['name'], hexToRgb(wteamColor), player['goals'], player['assists'], player['saves'], player['shots']);
+                } else {
+                    document.getElementById('lteam-players').innerHTML += getPlayerHTML(player['name'], hexToRgb(lteamColor), player['goals'], player['assists'], player['saves'], player['shots']);
+                }
+            });
+        });
+        
+
+
+
+
+        WsSubscribers.subscribe("mncs", "match_complete", (d) => {
+            // no data. just indicates whether we should mark a winner.
+            console.log("mncs match complete!");
+        });
+
+    });
+</script>

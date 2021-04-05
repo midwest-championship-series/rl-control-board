@@ -1,0 +1,106 @@
+<style>
+    .add-team-colors {
+        width: 35%;
+    }
+    .add-team-preview-color {
+        width: 20px;
+        height: 20px;
+        margin-left: 1%;
+        margin-right: 1%;
+        border-radius: 15px;
+        border: 2px solid #aaa;
+        display: inline-block;
+        transform: translate(0, 8px);
+    }
+    #setPlayerList input {
+        width: 30%;
+    }
+</style>
+
+<div id="add-team-modal" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+        <h2 class="uk-modal-title">Add New Team</h2>
+        <!-- Form here or sumtjhin -->
+        <form id="add-team-form" class="uk-grid-small" uk-grid>
+            <div class="uk-width-1-1">
+                <input class="uk-input" name="team-name" type="text" placeholder="Name" required minlength="2" maxlength="25" >
+            </div>
+            <div class="uk-width-1-1">
+                <input class="uk-input" name="team-avatar" type="text" placeholder="Avatar" required minlength="10">
+            </div>
+            
+            <label class="uk-form-label uk-width-1-1">Team Colors (Hex)</label>
+            <div class="uk-width-1-1">
+                <input class="uk-input add-team-colors" name="team-color-hp" type="text" placeholder="Home Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <div id="atpc-hp" class="add-team-preview-color"></div>
+                <input class="uk-input add-team-colors" name="team-color-hs" type="text" placeholder="Home Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <div id="atpc-hs" class="add-team-preview-color"></div>
+            </div>
+            <div class="uk-width-1-1">
+                <input class="uk-input add-team-colors" name="team-color-ap" type="text" placeholder="Away Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <div id="atpc-ap" class="add-team-preview-color"></div>
+                <input class="uk-input add-team-colors" name="team-color-as" type="text" placeholder="Away Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <div id="atpc-as" class="add-team-preview-color"></div>
+            </div>
+            <label class="uk-form-label uk-width-1-1">Players</label>
+            <div class="uk-width-1-1" id="setPlayerList">
+                <input class="uk-input" name="team-playerone" type="text" placeholder="Player One" required minlength="2">
+                <input class="uk-input" name="team-playertwo" type="text" placeholder="Player Two" required minlength="2">
+                <input class="uk-input" name="team-playerthree" type="text" placeholder="Player Three" required minlength="2">
+            </div>
+            <p class="uk-width-1-1" id="add-team-error", style="color: red;display: none;"></p>
+            <p class="uk-text-right">
+                <button class="uk-button uk-button-default uk-modal-close" type="button">Cancel</button>
+                <button class="uk-button uk-button-primary" type="submit">Add</button>
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelector("#add-team-form").addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        var data = $('#add-team-form').serializeArray().reduce(function(obj, item) {
+            obj[item.name] = item.value;
+            return obj;
+        }, {});
+
+        if(Relay.socketStatus === SocketStatus.CONNECTED && Relay.socket.loggedIn) {
+            let team = {
+                name: data["team-name"],
+                avatar: data["team-avatar"],
+                colors: {
+                    homePrimary: data["team-color-hp"],
+                    homeSecondary: data["team-color-hs"],
+                    awayPrimary: data["team-color-ap"],
+                    awaySecondary: data["team-color-as"],
+                },
+                players: [
+                    {
+                        name: data["team-playerone"]
+                    },
+                    {
+                        name: data["team-playertwo"]
+                    },
+                    {
+                        name: data["team-playerthree"]
+                    },
+                ]
+            };
+            Relay.socket.emit("add team", team, (err, reply) => {
+                if(err) {
+                    document.getElementById('add-team-error').style.display = "block";
+                    document.getElementById('add-team-error').innerText = err.message;
+                } else {
+                    document.getElementById('add-team-error').style.display = "none";
+                    $('#add-team-form input[type="text"]').val('');
+                    UIkit.modal(document.getElementById("add-team-modal")).hide();
+                }
+            });
+        } else {
+            document.getElementById('add-team-error').style.display = "block";
+            document.getElementById('add-team-error').innerText = "Not connected to relay.";
+        }
+    });
+</script>

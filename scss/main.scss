@@ -1,0 +1,8 @@
+$global-link-color: #DA7D02;
+
+@import "uikit/variables-theme.scss";
+@import "uikit/mixins-theme.scss";
+
+
+// Import uikit last
+@import "uikit/uikit-theme.scss";

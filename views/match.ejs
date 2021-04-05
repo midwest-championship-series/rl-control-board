@@ -1,0 +1,49 @@
+<style>
+    #match-container {
+        display: flex;
+        flex-flow: row wrap;
+        margin-left: 40px;
+    }
+</style>
+
+<p>Match</p>
+
+<div id="match-container">
+    <div class="panel-1-half panel-pad" style="border: 4px dashed black;">
+        <div class="uk-grid-small" uk-grid>
+            <h2 style="width: 100%;text-align:center;">Game Settings</h2>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;">Best of</p>
+                <select class="uk-select" style="width: 150px;margin-left:10px;">
+                    <option>1</option>
+                    <option>3</option>
+                    <option>5</option>
+                    <option>7</option>
+                    <option>9</option>
+                </select>
+            </div>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;">Match Title</p>
+                <input type="text" class="uk-input" style="width: 350px;margin-left: 10px;" placeholder="Match Title" />
+            </div>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;">Team Size</p>
+                <select class="uk-select" style="width: 150px;margin-left:10px;">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+            </div>
+            <div class="uk-width-1-1">
+                <button class="uk-button uk-button-primary" style="width: 100%;" onclick="matchSendGameUpdate()">Send Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function matchSendGameUpdate() {
+        console.log("Sending update");
+    }
+</script>
