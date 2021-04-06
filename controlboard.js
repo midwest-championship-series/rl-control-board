@@ -77,7 +77,7 @@ const Relay = {
             Relay.socket.emit("mncs_register");
             
 
-            Relay.socket.emit("login", "testtoken", (status) => {
+            Relay.socket.emit("login", getCookie("token"), (status) => {
                 if(status !== "good") {
                     Relay.socket.loggedIn = false;
                     Relay.socket.close();
@@ -167,10 +167,9 @@ const Game = {
     bestOf
     teamSize
     matchTitle
-    scene
     */
     updateGame: function(gameOptions, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("update game info", gameOptions, callback);
         } else
             callback({
@@ -179,7 +178,7 @@ const Game = {
             });
     },
     setHomeTeam: function(tteam, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("set team", {teamnum: 0, team: tteam}, callback);
         } else
             callback({
@@ -188,7 +187,7 @@ const Game = {
             });
     },
     setAwayTeam: function(tteam, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("set team", {teamnum: 1, team: tteam}, callback);
         } else
             callback({
@@ -206,7 +205,7 @@ const Teams = {
         });
     },
     updateTeam: function(team, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("update team", team.name, team, callback);
         } else
             callback({
@@ -215,7 +214,7 @@ const Teams = {
             });
     },
     removeTeam: function(name, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("remove team", name, callback);
         } else
             callback({
@@ -224,7 +223,7 @@ const Teams = {
             });
     },
     addTeam: function(team, callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("add team", team, callback);
         } else
             callback({
@@ -233,7 +232,7 @@ const Teams = {
             });
     },
     getTeams: function(callback) {
-        if(Relay.socket.loggedIn) {
+        if(Relay.socket && Relay.socket.loggedIn) {
             Relay.socket.emit("get teams", callback);
         } else
             callback(undefined, {

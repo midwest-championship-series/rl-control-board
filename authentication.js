@@ -1,7 +1,13 @@
-// When you make changes here, don't forget to reinstall this package into ControlBoard and Relay!
-// npm install ../Authentication --save
+// this is temporary i promise
 const validateToken = (token) => {
-	if(token === "testtoken")
+	const tokens = [
+		"Vp75jBPrjnhB5fW6Sft7E5Ea", 
+		"7pfV4bNwqDjsHT9BArM9FY37", 
+		"wTJ2bAQW9R6M89NTSaqUsAvQ", 
+		"rrpW2ZT2sdF4CCv8ka6mmkeL", 
+		"sceGyRn8FAJqwDEJUwAYWYLq"
+	];
+	if(tokens.includes(token))
 		return true;
 	return false;
 };
