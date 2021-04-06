@@ -60,8 +60,7 @@ exports.processScene = function processScene(scene, res) {
                                 fs.readFile('./overlays/' + scene + '/overlay.html', 'utf-8', (err, data) => {
                                     if(!err) {
                                         // Update img references
-                                        var newText = data.replace(/src='.?\/?img/gm, "src='./img/" + scene);
-                                        var newText = data.replace(/src=".?\/?img/gm, "src=\"./img/" + scene);
+                                        var newText = data.replace(/.?\/?img/gm, "./img/" + scene);
                         
                                         fs.writeFile('./overlays/' + scene + '/overlay.html', newText, 'utf-8', (err) => {
                                             if(err)
