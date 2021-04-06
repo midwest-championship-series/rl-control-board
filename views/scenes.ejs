@@ -5,3 +5,22 @@
     I know what you're thinking: HOLY SHIT CHEZ! that's mfin brilliant.
     Anyways, i'll probably think of a solution to implement it later,
     and by later I mean by December 2022. -->
+<div id="scene-uploader" uk-form-custom>
+    <input type="file">
+    <button class="uk-button uk-button-default" type="button" tabindex="-1">Select</button>
+</div>
+
+<script>
+    UIkit.upload('#scene-uploader', {
+        url: '/upload-scene',
+        params: {
+            token: getCookie("token"),
+            name: "SCENE_NAME"
+        },
+        multiple: false,
+        name: "scene",
+        completeAll: function() {
+            sendNotification("upload complete");
+        }
+    })
+</script>

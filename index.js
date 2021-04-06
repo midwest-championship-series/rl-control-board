@@ -2,8 +2,10 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const fileupload = require('express-fileupload');
 const { sslRedirect } = require('./ssl');
 const { validateToken } = require('./authentication');
+const { processScene } = require('./process-scene.js');
 
 const app = express();
 
@@ -16,6 +18,7 @@ app.use(cookieParser());
 if(process.env.NODE_ENV === "production")
     app.use(sslRedirect());
     
+app.use(fileupload());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -35,6 +38,33 @@ app.get('/overlay', (req, res) => {
 app.post('/login', (req, res) => {
     if(req.body.token && validateToken(req.body.token))
         res.send('successful');
+    return res.status(400).end();
+});
+
+app.post('/upload-scene', async (req, res) => {
+    if(req.body.token && validateToken(req.body.token)) {
+        try {
+            if(!req.files) {
+                return res.status(400).send({
+                    status: false,
+                    message: 'No file uploaded'
+                }).end();
+            } else {
+                let scene = req.files.scene;
+
+                // Only allow zippers
+                if(scene.mimetype === "application/zip") {
+                    scene.mv('./scenes/' + req.body.name + ".zip");
+       
+                    // send response
+                    return processScene(req.body.name, res);
+                }
+            }
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send(err).end();
+        }
+    }
     return res.status(400).end();
 });
 
