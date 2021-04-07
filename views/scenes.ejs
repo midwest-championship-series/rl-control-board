@@ -1,3 +1,11 @@
+<style>
+    #scenes-container {
+        display: flex;
+        flex-flow: row wrap;
+        margin-left: 40px;
+        max-height: 220px;
+    }
+</style>
 <p>Scenes</p>
 
 <!-- The date is 3/4/2021. 10:21 PM. chezy had a brilliant foken idea, aight? 
@@ -5,22 +13,132 @@
     I know what you're thinking: HOLY SHIT CHEZ! that's mfin brilliant.
     Anyways, i'll probably think of a solution to implement it later,
     and by later I mean by December 2022. -->
-<div id="scene-uploader" uk-form-custom>
-    <input type="file">
-    <button class="uk-button uk-button-default" type="button" tabindex="-1">Select</button>
+<div id="scenes-container">
+    <div class="panel-1-half panel-pad" style="height: 200px !important;min-height: 200px !important;border: 4px dashed black;">
+        <div class="uk-grid-small" uk-grid>
+            <h2 style="width: 100%;text-align:center;">Upload Scene</h2>
+            <div id="scene-uploader" style="margin-left:20px;width: 100%;" class="uk-placeholder uk-text-center">
+                <span uk-icon="icon: cloud-upload"></span>
+                <span class="uk-text-middle">Drop scenes here or </span>
+                <div uk-form-custom>
+                    <input type="file" multiple>
+                    <span class="uk-link">select one</span>
+                </div>
+                <span class="uk-text-middle"> (.zip, 20mb limit)</span>
+            </div>
+            <progress id="scene-upload-pb" class="uk-progress" value="0" max="100" hidden></progress>
+        </div>
+    </div>
+    <div class="panel-1-half panel-pad" style="height: 200px !important;min-height: 200px !important;border: 4px dashed black;">
+        <div class="uk-grid-small" uk-grid>
+            <h2 style="width: 100%;text-align:center;">Remove Scene</h2>
+            <select id="remove-scene-input" class="uk-select" style="width: 100%;margin-left: 10px;">
+                <!-- Populate with scenes -->
+                <option value="-" selected> --- Select Scene --- </option>
+            </select>
+            <div class="uk-width-1-1">
+                <button class="uk-button uk-button-primary" style="width: 100%;margin-left: 0px;" onclick="sceneRemoveScene()">Remove Scene</button>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-pad" style="height: 200px !important;min-height: 200px !important;border: 4px dashed black;">
+        <div class="uk-grid-small" uk-grid>
+            <h2 style="width: 100%;text-align:center;">Scene Events</h2>
+            <select id="remove-scene-input" class="uk-select" style="width: 100%;margin-left: 10px;">
+                <!-- Populate with scenes -->
+                <option value="-" selected> --- Select Scene --- </option>
+            </select>
+            <div class="uk-width-1-1">
+                <button class="uk-button uk-button-primary" style="width: 100%;margin-left: 0px;" onclick="sceneUpdateSceneEvents()">Update Scene Events</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+
+    let sCurScenes = [];
+    function sceneRemoveScene() {
+        if(document.getElementById("remove-scene-input").value !== "-")
+            $.post("remove-scene", {
+                token: getCookie("token"),
+                scene_name: document.getElementById("remove-scene-input").value
+            }, (data, status) => {
+                Relay.socket.emit("scene removed", document.getElementById("remove-scene-input").value);
+            }).fail((xhr, status, err) => {
+                sendNotification(xhr.responseJSON.message);
+            });
+    }
+
+    function sceneUpdateSceneLists() {
+        document.getElementById("remove-scene-input").innerHTML = "<option value='-' selected> --- Select Scene --- </option>";
+        //document.getElementById("-scene-input").innerHTML = "<option value='-' selected> --- Select Scene --- </option>";
+        sCurScenes.forEach((entry) => {
+            document.getElementById("remove-scene-input").innerHTML += "<option>"+entry+"</option>";
+            //document.getElementById("-scene-input").innerHTML += "<option>"+entry+"</option>";
+        });
+    }
+
+    ServerManager.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+            $.get("scenes", (data, status, xhr) => {
+                sCurScenes = data.scenes;
+                sceneUpdateSceneLists();
+            });
+            Relay.socket.on("scene added", (name) => {
+                sendNotification("Scene added! ("+name+")");
+                sCurScenes.push(name);
+                sceneUpdateSceneLists();
+            });
+
+            Relay.socket.on("scene removed", (name) => {
+                sendNotification("Scene removed! ("+name+")");
+                sCurScenes = sCurScenes.filter(x => x !== name);
+                sceneUpdateSceneLists();
+            });
+        }
+    });
+
+    var scene_pb = document.getElementById('scene-upload-pb');
+
+    // Use this thingy to upload scenes
     UIkit.upload('#scene-uploader', {
         url: '/upload-scene',
         params: {
-            token: getCookie("token"),
-            name: "SCENE_NAME"
+            token: getCookie("token")
         },
         multiple: false,
         name: "scene",
-        completeAll: function() {
-            sendNotification("upload complete");
+        error: function() {
+            setTimeout(function () {
+                scene_pb.setAttribute('hidden', 'hidden');
+            }, 1000);
+            console.log(arguments["0"]);
+            let response = arguments["0"].xhr.response;
+            if(response.startsWith('{'))
+                sendNotification(JSON.parse(arguments["0"].xhr.response).message);
+            else
+                sendNotification(response);
+        },
+        loadStart: function (e) {
+            scene_pb.removeAttribute('hidden');
+            scene_pb.max = e.total;
+            scene_pb.value = e.loaded;
+        },
+        progress: function (e) {
+            
+            scene_pb.max = e.total;
+            scene_pb.value = e.loaded;
+        },
+        loadEnd: function (e) {
+            scene_pb.max = e.total;
+            scene_pb.value = e.loaded;
+            Relay.socket.emit("scene added", JSON.parse(e.target.response).scene);
+        },
+        completeAll: function () {
+            setTimeout(function () {
+                scene_pb.setAttribute('hidden', 'hidden');
+            }, 1000);
         }
-    })
+    });
 </script>

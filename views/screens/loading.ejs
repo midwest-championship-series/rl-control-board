@@ -1,0 +1,40 @@
+<!-- Full screen over control board showing cool animation or something -->
+
+<style>
+    #loading-container {
+        min-width: 100%;
+        min-height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(108, 172, 220);
+        /*display: flex; Change from display none to display flex when pushing to production! */
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        opacity: 1;
+        transition: opacity 2s;
+    }
+</style>
+
+<div id="loading-container">
+    <p style="color: #f90;font-size: 32px;">Loading...</p>
+</div>
+
+<script>
+
+
+    ServerManager.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+            document.getElementById("loading-container").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("loading-container").style.display = "none";
+            }, 2000);
+            document.body.style.overflow = "auto";
+        }
+    });
+</script>

@@ -2,7 +2,6 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const unzipper = require('unzipper');
 const mime = require('mime-types');
-const path = require('path');
 
 function cleanup(scene, res, success = false) {
     if(!success) {
@@ -22,7 +21,19 @@ function cleanup(scene, res, success = false) {
     fs.unlink('./scenes/' + scene + '.zip', () => {});
 }
 
-exports.processScene = function processScene(scene, res) {
+exports.getScenes = () => {
+    try {
+        let scenes = fs.readdirSync("./overlays", {withFileTypes: true})
+            .filter(x => x.isDirectory())
+            .map(x => x.name)
+            .filter(x => fs.existsSync("./overlays/" + x + "/.scene"));
+        return {error: undefined, scenes: scenes};
+    } catch(err) {
+        return {error: err, scenes: []};
+    }
+};
+
+exports.processScene = (scene, res) => {
     // process scene here
     try{
 
@@ -66,12 +77,19 @@ exports.processScene = function processScene(scene, res) {
                                             if(err)
                                                 cleanup(scene, res);
                                             else {
-                                                console.log("Parse successul!");
-                                                cleanup(scene, res, true);
-                                                return res.send({
-                                                    status: true,
-                                                    message: "Scene uploaded"
-                                                }).end();
+                                                fs.writeFile('./overlays/' + scene + '/.scene', "{'events':{}}", 'utf-8', (err) => {
+                                                    if(err)
+                                                        cleanup(scene, res);
+                                                    else {
+                                                        console.log("Parse successul!");
+                                                        cleanup(scene, res, true);
+                                                        return res.send({
+                                                            status: true,
+                                                            message: "Scene uploaded",
+                                                            scene: scene
+                                                        }).end();
+                                                    }
+                                                });
                                             }
                                         });
                         

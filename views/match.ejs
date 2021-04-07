@@ -14,24 +14,24 @@
             <h2 style="width: 100%;text-align:center;">Game Settings</h2>
             <div class="uk-width-1-1" style="margin-top: 5px;">
                 <p style="display: inline-block;">Best of</p>
-                <select class="uk-select" style="width: 150px;margin-left:10px;">
+                <select id="best-of-input" class="uk-select" style="width: 150px;margin-left:10px;">
                     <option>1</option>
                     <option>3</option>
-                    <option>5</option>
+                    <option selected>5</option>
                     <option>7</option>
                     <option>9</option>
                 </select>
             </div>
             <div class="uk-width-1-1" style="margin-top: 5px;">
                 <p style="display: inline-block;">Match Title</p>
-                <input type="text" class="uk-input" style="width: 350px;margin-left: 10px;" placeholder="Match Title" />
+                <input type="text" id="match-title-input" class="uk-input" style="width: 350px;margin-left: 10px;" placeholder="Match Title" />
             </div>
             <div class="uk-width-1-1" style="margin-top: 5px;">
                 <p style="display: inline-block;">Team Size</p>
-                <select class="uk-select" style="width: 150px;margin-left:10px;">
+                <select id="team-size-input" class="uk-select" style="width: 150px;margin-left:10px;">
                     <option>1</option>
                     <option>2</option>
-                    <option>3</option>
+                    <option selected>3</option>
                     <option>4</option>
                 </select>
             </div>
@@ -40,10 +40,168 @@
             </div>
         </div>
     </div>
+    <div class="panel panel-pad" style="border: 4px dashed black;">
+        <div class="uk-grid-small" uk-grid>
+            <h2 style="width: 100%;text-align:center;">Current Match</h2>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;width: 86px;">Home Team</p>
+                <select id="home-team-input" class="uk-select" style="width: 340px;margin-left: 10px;">
+                    <!-- Populate with teams -->
+                    <option value="-" selected> --- Select Team --- </option>
+                </select>
+            </div>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;">Series Score</p>
+                <select id="home-team-score-input" class="uk-select" style="width: 335px;margin-left: 10px;">
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+            </div>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;width: 86px;">Away Team</p>
+                <select id="away-team-input" class="uk-select" style="width: 340px;margin-left: 10px;">
+                    <!-- Populate with teams -->
+                    <option value="-" selected> --- Select Team --- </option>
+                </select>
+            </div>
+            <div class="uk-width-1-1" style="margin-top: 5px;">
+                <p style="display: inline-block;">Series Score</p>
+                <select id="away-team-score-input" class="uk-select" style="width: 335px;margin-left: 10px;">
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+            </div>
+            <div class="uk-width-1-1">
+                <button class="uk-button uk-button-primary" style="width: 100%;" onclick="matchSendTeamUpdate()">Send Update</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+    let mCurTeamList = [];
     function matchSendGameUpdate() {
-        console.log("Sending update");
+        let update = {
+            matchTitle: document.getElementById("match-title-input").value,
+            teamSize: Number(document.getElementById("team-size-input").value),
+            bestOf: Number(document.getElementById("best-of-input").value)
+        }
+        Game.updateGame(update, (err, reply) => {
+            if(err) {
+                sendNotification("Couldn't update game info.");
+                console.log(err);
+            }
+        });
     }
+    function matchSendTeamUpdate() {
+        let hTeam = mCurTeamList.find(x => x.name === document.getElementById("home-team-input").value);
+        let aTeam = mCurTeamList.find(x => x.name === document.getElementById("away-team-input").value);
+        if(hTeam && aTeam) {
+            hTeam.series = document.getElementById("home-team-score-input").value;
+            aTeam.series = document.getElementById("away-team-score-input").value;
+
+            Game.setHomeTeam(hTeam, (err, reply) => {
+                if(err)
+                    console.log(err);
+                else
+                    Game.setAwayTeam(aTeam, (err, reply) => {
+                        if(err)
+                            console.log(err);
+                    });
+            });
+        }
+    }
+    function matchPopulateSelects(teams) {
+        document.getElementById("home-team-input").innerHTML = "<option value='-' selected> --- Select Team --- </option>";
+        document.getElementById("away-team-input").innerHTML = "<option value='-' selected> --- Select Team --- </option>";
+        teams.forEach((entry) => {
+            document.getElementById("home-team-input").innerHTML += "<option>"+entry.name+"</option>";
+            document.getElementById("away-team-input").innerHTML += "<option>"+entry.name+"</option>";
+        });
+    }
+    ServerManager.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+
+            
+            Relay.socket.emit("get teams", (teams, err) => {
+                if(!err) {
+                    mCurTeamList = teams;
+                    matchPopulateSelects(mCurTeamList);
+
+                    Relay.socket.emit("get game info", (game, err) => {
+                        if(!err) {
+                            console.log(game);
+                            document.getElementById("match-title-input").value = game.matchTitle ?? "Minnesota Championship Series";
+                            document.getElementById("best-of-input").value = game.bestOf ?? 5;
+                            document.getElementById("team-size-input").value = game.teamSize ?? 3;
+                            document.getElementById("home-team-input").value = (game.homeTeam ? game.homeTeam.name : "-") ?? "-";
+                            document.getElementById("away-team-input").value = (game.awayTeam ? game.awayTeam.name : "-") ?? "-";
+                            document.getElementById("home-team-score-input").value = (game.homeTeam ? game.homeTeam.series : 0) ?? 0;
+                            document.getElementById("away-team-score-input").value = (game.awayTeam ? game.awayTeam.series : 0) ?? 0;
+                        } else
+                            console.log(err);
+                    });
+                } else
+                    console.log(err);
+            });
+
+            Relay.socket.on("game info updated", (game) => {
+                console.log(game);
+                sendNotification("Game info updated!");
+                document.getElementById("match-title-input").value = game.matchTitle ?? "Minnesota Championship Series";
+                document.getElementById("best-of-input").value = game.bestOf ?? 5;
+                document.getElementById("team-size-input").value = game.teamSize ?? 3;
+            });
+
+            Relay.socket.on("team removed", (name) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
+                mCurTeamList = mCurTeamList.filter(x => x.name !== name);
+                matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
+            });
+
+            Relay.socket.on("team added", (team) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
+                mCurTeamList.push(team);
+                matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
+            });
+
+            Relay.socket.on("team updated", (name, team) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
+                mCurTeamList = mCurTeamList.filter(x => x.name !== name);
+                mCurTeamList.push(team);
+                matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
+            });
+
+            Relay.socket.on("team set", (data) => {
+                sendNotification(data.teamnum === 0 ? "Home team updated!" : "Away team updated!");
+                if(data.teamnum === 0) {
+                    document.getElementById("home-team-input").value = data.team.name;
+                    document.getElementById("home-team-score-input").value = data.team.series;
+                } else {
+                    document.getElementById("away-team-input").value = data.team.name;
+                    document.getElementById("away-team-score-input").value = data.team.series;
+                }
+            });
+
+            Relay.socket.on("game ended", (game) => {
+                document.getElementById("home-team-score-input").value = game.homeTeam.series;
+                document.getElementById("away-team-score-input").value = game.awayTeam.series;
+            });
+        }
+    });
 </script>

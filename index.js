@@ -1,11 +1,15 @@
+// Local Imports
 require('dotenv').config();
+const { processScene, getScenes } = require('./modules/scenes.js');
+const { sslRedirect } = require('./modules/ssl');
+const { validateToken } = require('./modules/authentication');
+
+// Package Imports
 const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fileupload = require('express-fileupload');
-const { sslRedirect } = require('./ssl');
-const { validateToken } = require('./authentication');
-const { processScene } = require('./process-scene.js');
+const { access, rmdir } = require('fs');
 
 const app = express();
 
@@ -18,7 +22,8 @@ app.use(cookieParser());
 if(process.env.NODE_ENV === "production")
     app.use(sslRedirect());
     
-app.use(fileupload());
+// 20mb file limit
+app.use(fileupload({limits: {fileSize: 200000000}, abortOnLimit: true}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
@@ -32,7 +37,25 @@ app.get('/', (req, res) => {
 });
 
 app.get('/overlay', (req, res) => {
-    res.render('overlay', {scenes: ["WAITING", "PRE_GAME", "MATCH", "POST_GAME", "PAUSE"]}); // Plug scenes in
+    if(req.cookies.token && validateToken(req.cookies.token)) {
+        let { err, scenes } = getScenes();
+        if(err)
+            return res.status(500).render('overlay/error', {error_msg: err.message});
+        else
+            return res.status(200).render('overlay/overlay', {scenes: scenes}); // Plug scenes in
+    }
+    res.render('overlay/login');
+});
+
+app.get('/scenes', (req, res) => {
+    if(req.cookies.token && validateToken(req.cookies.token)) {
+        let { err, scenes } = getScenes();
+        if(err)
+            return res.status(500).send({error: err}).end();
+        else
+            return res.status(200).send({scenes: scenes}).end();
+    }
+    return res.status(400).end();
 });
 
 app.post('/login', (req, res) => {
@@ -41,7 +64,7 @@ app.post('/login', (req, res) => {
     return res.status(400).end();
 });
 
-app.post('/upload-scene', async (req, res) => {
+app.post('/upload-scene', (req, res) => {
     if(req.body.token && validateToken(req.body.token)) {
         try {
             if(!req.files) {
@@ -52,12 +75,19 @@ app.post('/upload-scene', async (req, res) => {
             } else {
                 let scene = req.files.scene;
 
+                if(scene.name.replace(".zip", "").length === 0)
+                    return res.status(400).send({
+                        status: false,
+                        message: 'File name must be greater than 0'
+                    }).end();
+
+                console.log(scene.name);
                 // Only allow zippers
                 if(scene.mimetype === "application/zip") {
-                    scene.mv('./scenes/' + req.body.name + ".zip");
+                    scene.mv('./scenes/' + scene.name);
        
                     // send response
-                    return processScene(req.body.name, res);
+                    return processScene(scene.name.replace(".zip", ""), res);
                 }
             }
         } catch (err) {
@@ -66,6 +96,41 @@ app.post('/upload-scene', async (req, res) => {
         }
     }
     return res.status(400).end();
+});
+
+app.post('/remove-scene', (req, res) => {
+    if(req.body.token && validateToken(req.body.token)) {
+        try {
+            let scene = req.body.scene_name;
+            access("./overlays/" + scene, (err) => {
+                if(err) {
+                    // Scene doesn't exist
+                    return res.status(400).send({
+                        status: false,
+                        message: "Scene doesn't exist"
+                    })
+                } else {
+                    // Scene exists, remove
+                    rmdir('./public/img/' + scene, {
+                        recursive: true
+                    }, () => {
+                        rmdir('./overlays/' + scene, {
+                            recursive: true
+                        }, () => {
+                            return res.send({
+                                status: true,
+                                message: "Scene removed"
+                            }).end();
+                        });
+                    });
+                }
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send(err).end();
+        }
+    } else
+        return res.status(400).send().end();
 });
 
 app.listen(process.env.PORT, () => {
