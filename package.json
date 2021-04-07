@@ -22,7 +22,6 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "mime-types": "^2.1.30",
-    "mkdirp": "^1.0.4",
     "sass": "^1.32.6",
     "socket.io-client": "^4.0.1",
     "uglifycss": "0.0.29",

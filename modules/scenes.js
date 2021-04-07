@@ -1,5 +1,4 @@
 const fs = require('fs');
-const mkdirp = require('mkdirp');
 const unzipper = require('unzipper');
 const mime = require('mime-types');
 
@@ -71,7 +70,7 @@ exports.processScene = (scene, res) => {
                                 fs.readFile('./overlays/' + scene + '/overlay.html', 'utf-8', (err, data) => {
                                     if(!err) {
                                         // Update img references
-                                        var newText = data.replace(/.?\/?img/gm, "./img/" + scene);
+                                        var newText = data.replace(/.?\/?img/gm, "../img/" + scene);
                         
                                         fs.writeFile('./overlays/' + scene + '/overlay.html', newText, 'utf-8', (err) => {
                                             if(err)

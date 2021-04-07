@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>MNCS Overlay</title>
-        <link rel="stylesheet" href="./overlay/bootstrap.min.css">
+        <link rel="stylesheet" href="./bootstrap.min.css">
         <style>
             .overlay {
                 width: 100%;
@@ -30,39 +30,11 @@
                 -khtml-transition: background-color 0.5s ease-in-out;
                 transition: background-color 0.5s ease-in-out;
             }
-            #BOOOOOOOOOOOOOOOOOOST {
-                width: 260px;
-                height: 260px;
-                border: none;
-                bottom:0px;
-                right:0px;
-                z-index: 9;
-                position: absolute;
-                background-color: rgba(0, 0, 0, 0);
-                margin: 0px auto;
-                overflow: hidden;
-
-                -ms-transform: scale(0.8);
-                -moz-transform: scale(0.8);
-                -o-transform: scale(0.8);
-                -webkit-transform: scale(0.8);
-                transform: scale(0.8);
-
-                -ms-transform-origin: 0 0;
-                -moz-transform-origin: 0 0;
-                -o-transform-origin: 0 0;
-                -webkit-transform-origin: 0 0;
-                transform-origin: 0 0;
-            }
             .popup p {
                 margin: 0;
             }
             #transition {
                 z-index:10;
-            }
-
-            #match-details-screen, #replay-screen {
-                z-index:1;
             }
 
             #pre-game-screen, #post-game-screen, #technical-pause-screen {
@@ -76,139 +48,31 @@
                 color: white;
             }
         </style>
-        <script src="./overlay/jquery.js"></script>
-        <script src="./overlay/animate.js"></script>
+        <script src="./jquery.min.js"></script>
+        <script src="./animate.js"></script>
+        <script>
+            <%- include('../../node_modules/socket.io-client/dist/socket.io.min.js'); %>
+        </script>
+        <script>
+            let scenes = <%- JSON.stringify(scenes.events); %>;
+        </script>
+        <script>
+            <%- include('overlay.js'); %>
+        </script>
     </head>
     <body>
 
         <video class="overlay" id="transition" muted="muted">
-            <source src="./overlay/transition.webm" type="video/webm">
+            <source src="./transition.webm" type="video/webm">
         </video>
 
-        <% scenes.forEach((entry) => { %>
-            <%- include('../overlays/' + entry + '/overlay.html'); %>
+        <% scenes.names.forEach((entry) => { %>
+            <%- include('../../overlays/' + entry + '/overlay.html'); %>
         <% }); %>
         
         <script>
-
-			var transitioning = false;
-			
-            function transition(speed) {
-                document.querySelector('#transition').playbackRate = speed;
-                document.querySelector('#transition').play();
-            }
-
-            function hideAllScenes() {
-                document.querySelectorAll('.component').forEach((entry) => {
-                    entry.style.opacity = "0";
-                });
-            }
-
-            function getCurrentScene() {
-                let toRet = "";
-                document.querySelectorAll('.component').forEach((entry) => {
-                    if(entry.style.opacity === "1")
-                        toRet = entry.getAttribute("scene");
-                });
-                return toRet;
-            }
-
-            function connectToRelay() {
-                if(!WsSubscribers.webSocketConnected){
-                    WsSubscribers.init(49322, false);
-                    
-                    setTimeout(function() {
-                        if(WsSubscribers.webSocket.readyState === 3) {
-                            connectToRelay();
-                        }
-                    }, 4000);
-                }
-            }
-
-            function connectToControlBoard() {
-                if(!ControlBoard.webSocketConnected){
-                    ControlBoard.init();
-
-                    setTimeout(function() {
-                        if(!ControlBoard.webSocket.readyState === 3) {
-                            connectToControlBoard();
-                        }
-                    }, 4000);
-                }
-            }
-
-            function switchScene(scene, transition){
-				if(transitioning === false){
-					transitioning = true;
-					if(transition){
-						ControlBoard.webSocket.send(JSON.stringify({'event_name': 'begin_transition'}));
-						document.querySelector('video').playbackRate = 1.3;
-						document.querySelector('video').play();
-						setTimeout(function() {
-							ControlBoard.webSocket.send(JSON.stringify({'event_name': 'scene_change', 'from': getCurrentScene(), 'to': scene}));
-							hideAllScenes();
-
-                            document.querySelectorAll('.component').forEach((entry) => {
-                                if(entry.getAttribute("scene") === scene)
-                                    entry.style.opacity = "1";
-                            });
-						}, 500);
-						setTimeout(function() {
-							transitioning = false;
-						}, 1000);
-					} else {
-						console.log(getCurrentScene());
-						ControlBoard.webSocket.send(JSON.stringify({'event_name': 'scene_change', 'from': getCurrentScene(), 'to': scene}));
-						hideAllScenes();
-						document.querySelectorAll('.component').forEach((entry) => {
-                            if(entry.getAttribute("scene") === scene)
-                                entry.style.opacity = "1";
-                        });
-						transitioning = false;
-					}   
-				}
-            }
-
+/*
             $(() => {
-                ControlBoard.subscribe("controlboard", "switch_scene", (d) => {
-                    switchScene(d['scene'], d['transition']);
-                });
-                ControlBoard.subscribe("ws", "open", (d) => {
-                    document.querySelector('video').addEventListener('ended', (event) => {
-                        ControlBoard.webSocket.send(JSON.stringify({'event_name': 'end_transition'}));
-                    });
-                });
-                ControlBoard.subscribe("ws", "close", (d) => {
-                    setTimeout(function() {
-                        connectToControlBoard();
-                    }, 3000);
-                });
-                WsSubscribers.subscribe("ws", "close", (d) => {
-                    setTimeout(function() {
-                        connectToRelay();
-                    }, 3000);
-                });
-                WsSubscribers.subscribe("mncs", "reset", (d) => {
-                    ControlBoard.webSocket.send(JSON.stringify({'event_name': 'reset'}));
-                    document.querySelectorAll('.component').forEach((entry) => {
-                        entry.style.opacity = "0";
-                        if(entry.getAttribute("default") === "true")
-                            switchScene(entry.getAttribute("scene"), false);
-                    });
-                    matchEnd = false;
-                    teamSize = 6;
-                });
-            });
-
-        </script>
-        <script>
-
-            $(() => {
-
-                connectToControlBoard();
-
-                var teamSize = 6;
-                var matchEnd = false;
 
                 ControlBoard.subscribe("ws", "open", (d) => {
                     document.getElementById('controlboard-connecting').style.display = "none";
@@ -220,10 +84,6 @@
                     document.getElementById('controlboard-status').innerText = "Control Board disconnected.";
                     document.getElementById('controlboard-div').style.backgroundColor = "#BC3232";
                 });
-                WsSubscribers.subscribe("mncs", "reset", (d) => {
-                    matchEnd = false;
-                    teamSize = 6;
-                });
                 WsSubscribers.subscribe("ws", "open", (d) => {
                     document.getElementById('plugin-connecting').style.display = "none";
                     document.getElementById('plugin-status').innerText = "Relay Connected!";
@@ -233,10 +93,6 @@
                     document.getElementById('plugin-connecting').style.display = "block";
                     document.getElementById('plugin-status').innerText = "Relay disconnected.";
                     document.getElementById('plugin-div').style.backgroundColor = "#BC3232";
-                });
-                WsSubscribers.subscribe("game", "match_created", (d) => {
-                    // match created, setup pre-match screen
-                    //document.querySelector('#pre-game-screen').style.opacity = "1";
                 });
                 WsSubscribers.subscribe("game", "goal_scored", (d) => {
                     // transition into replay
@@ -292,13 +148,7 @@
                         }
                     }
                 })
-                WsSubscribers.subscribe("mncs", "update_state", (d) => {
-                    // use for post-game screen?
-                    console.log(d);
-                    teamSize = d['match']['team_size'];
-                });
-                connectToRelay();
-            });
+            });*/
         </script>
     </body>
 </html>

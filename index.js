@@ -9,7 +9,7 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fileupload = require('express-fileupload');
-const { access, rmdir } = require('fs');
+const { access, rmdir, readFileSync } = require('fs');
 
 const app = express();
 
@@ -39,10 +39,17 @@ app.get('/', (req, res) => {
 app.get('/overlay', (req, res) => {
     if(req.cookies.token && validateToken(req.cookies.token)) {
         let { err, scenes } = getScenes();
+        let scenes_obj = {
+            names: scenes,
+            events: {}
+        };
+        scenes.forEach((entry) => {
+            scenes_obj.events[entry] = JSON.parse(readFileSync("./overlays/" + entry + "/.scene"));
+        });
         if(err)
             return res.status(500).render('overlay/error', {error_msg: err.message});
         else
-            return res.status(200).render('overlay/overlay', {scenes: scenes}); // Plug scenes in
+            return res.status(200).render('overlay/overlay', {scenes: scenes_obj}); // Plug scenes in
     }
     res.render('overlay/login');
 });
