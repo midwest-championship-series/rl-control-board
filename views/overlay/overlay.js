@@ -7,6 +7,7 @@ const SocketStatus = {
 const Relay = {
     server: undefined,
     socket: undefined,
+    id: undefined,
     socketStatus: SocketStatus.DISCONNECTED,
     onStatusChangedListeners: [],
     init: function(server) {
@@ -15,29 +16,41 @@ const Relay = {
 
         Relay.server = server;
         Relay.socket = io(server, {
-            reconnection: false,
+            reconnection: true,
+            timeout: 5000,
             transports: ['websocket'], // long polling doesn't work due to cors or some shiet
             upgrade: false
         });
 
         Relay.socket.on("connect", () => {
             Relay.socket.emit("mncs_register");
+            Relay.id = getCookie("name");
             
             Relay.socketStatus = SocketStatus.CONNECTED;
             Relay.statusUpdate(SocketStatus.CONNECTED, server);
-
-            Relay.socket.on("disconnect", () => {
-                Relay.socketStatus = SocketStatus.DISCONNECTED;
-                Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
-                server = undefined;
-            });
         });
 
-        Relay.socket.on("connect_error", (err) => {
+        Relay.socket.on("disconnect", () => {
             Relay.socketStatus = SocketStatus.DISCONNECTED;
-            Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
-            server = undefined;
+            Relay.statusUpdate(SocketStatus.DISCONNECTED, server);
         });
+
+        Relay.socket.on("reconnect_attempt", (err) => {
+            Relay.socketStatus = SocketStatus.CONNECTING;
+            Relay.statusUpdate(SocketStatus.CONNECTING, server);
+        });
+
+        Relay.socket.on("reconnect_error", (err) => {
+            Relay.socketStatus = SocketStatus.DISCONNECTED;
+            Relay.statusUpdate(SocketStatus.DISCONNECTED, server);
+        });
+
+        Relay.socket.on("reconnect", (err) => {
+            Relay.socketStatus = SocketStatus.CONNECTED;
+            Relay.statusUpdate(SocketStatus.CONNECTED, server);
+        });
+
+        this.statusUpdate("INITIALIZED", server);
     },
     addListener: function(event, cb) {
         if(event === "status_changed")
@@ -52,7 +65,7 @@ const Relay = {
     }
 };
 
-// getCookie from https://www.w3schools.com/js/js_cookies.asp
+// setCookie & getCookie from https://www.w3schools.com/js/js_cookies.asp
 function getCookie(cname) {
     var name = cname + "=";
     var ca = document.cookie.split(';');
@@ -66,6 +79,13 @@ function getCookie(cname) {
         }
     }
     return "";
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 class Scene extends HTMLDivElement {
@@ -125,9 +145,23 @@ $(() => {
                 
     Relay.addListener("status_changed", (data) => {
         if(data["status"] === "CONNECTED") {
-            Object.entries(scenes).forEach(([key, value]) => {
-                // key: scene
-                // value: .scenes file
+            Relay.socket.emit("activate", Relay.id, (status) => {
+                if(status !== "good") {
+                    console.log("deactivating");
+                    setCookie("token", "");
+                    setCookie("name", "");
+                    setCookie("server", "");
+                    location.reload();
+                }
+            });
+
+            Relay.socket.on("match ended", (match) => {
+                Object.entries(scenes).forEach(([key, value]) => {
+                    if(value.show.event === "mncs:match_ended")
+                        updateScene(key, value.show.delay, value.show.transition, value.show.transition_rate, true);
+                    else if(value.hide.event === "mncs:match_ended")
+                        updateScene(key, value.hide.delay, value.hide.transition, value.hide.transition_rate, false);
+                });
             });
 
             Relay.socket.on("game event", (ev) => {
@@ -152,6 +186,17 @@ $(() => {
 
             Relay.socket.on("hide scene", (data) => {
                 updateScene(data.scene, data.delay, data.transition, data.transition_rate, false);
+            });
+
+            Relay.socket.on("deactivate", (id) => {
+                if(Relay.id === id) {
+                    console.log("Deactivating");
+                    // F in the chat
+                    setCookie("token", "");
+                    setCookie("name", "");
+                    setCookie("server", "");
+                    location.reload();
+                }
             });
         }
     });

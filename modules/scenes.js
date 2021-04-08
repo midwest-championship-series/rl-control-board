@@ -8,7 +8,7 @@ function cleanup(scene, res, success = false) {
         fs.rmdir('./public/img/' + scene, {
             recursive: true
         }, () => {});
-        fs.rmdir('./overlays/' + scene, {
+        fs.rmdir('./scenes/' + scene, {
             recursive: true
         }, () => {});
 
@@ -17,49 +17,56 @@ function cleanup(scene, res, success = false) {
             message: "Invalid scene"
         }).end();
     }
-    fs.unlink('./scenes/' + scene + '.zip', () => {});
+    fs.unlink('./uploads/' + scene + '.zip', () => {});
 }
 
 exports.getScenes = () => {
     try {
-        let scenes = fs.readdirSync("./overlays", {withFileTypes: true})
+        let scenes = fs.readdirSync("./scenes", {withFileTypes: true})
             .filter(x => x.isDirectory())
             .map(x => x.name)
-            .filter(x => fs.existsSync("./overlays/" + x + "/.scene"));
+            .filter(x => fs.existsSync("./scenes/" + x + "/.scene"));
         return {error: undefined, scenes: scenes};
     } catch(err) {
         return {error: err, scenes: []};
     }
 };
 
+// data must be complete
+exports.updateScene = (scene, data) => {
+    fs.writeFile('./scenes/' + scene + '/.scene', JSON.stringify(data), 'utf-8', (err) => {
+        return err;
+    });
+};
+
 exports.processScene = (scene, res) => {
     // process scene here
     try{
 
-        fs.access("./overlays/" + scene, (err) => {
+        fs.access("./scenes/" + scene, (err) => {
             if(!err) {
-                fs.unlink('./scenes/' + scene + '.zip', () => {});
+                fs.unlink('./uploads/' + scene + '.zip', () => {});
                 return res.status(400).send({
                     status: false,
                     message: "Scene already exists"
                 }).end();
             } else {
                 let overlay = false;
-                fs.mkdir('./overlays/' + scene, {recursive: true}, () => {
-                    fs.mkdirSync('./public/img/' + scene, {recursive: true});
-                    console.log("Parsing ./scenes/" + scene + ".zip");
-                    fs.createReadStream('./scenes/' + scene + ".zip")
+                fs.mkdir('./scenes/' + scene, {recursive: true}, () => {
+                    fs.mkdirSync('./public/overlay/img/' + scene, {recursive: true});
+                    console.log("Parsing ./uploads/" + scene + ".zip");
+                    fs.createReadStream('./uploads/' + scene + ".zip")
                         .pipe(unzipper.Parse())
                         .on('entry', function (entry) {
                             const fileName = entry.path;
-                            
-                            if(entry.type === "Directory") {
-                                fs.mkdirSync('./public/img/' + scene + '/' + fileName, {recursive: true});
+            
+                            if(entry.type === "Directory" && fileName !== "img/") {
+                                fs.mkdirSync('./public/overlay/img/' + scene + '/' + fileName.replace("img/", ""), {recursive: true});
                             } else if (fileName === "overlay.html") {
                                 overlay = true;
-                                entry.pipe(fs.createWriteStream('./overlays/' + scene + '/overlay.html', { flags: 'w'}));
+                                entry.pipe(fs.createWriteStream('./scenes/' + scene + '/overlay.html', { flags: 'w'}));
                             } else if(mime.lookup(fileName) && mime.lookup(fileName).includes('image/')) {
-                                entry.pipe(fs.createWriteStream('./public/img/' + scene + '/' + fileName, { flags: 'w'}));
+                                entry.pipe(fs.createWriteStream('./public/overlay/img/' + scene + '/' + fileName.replace("img/", ""), { flags: 'w'}));
                             } else {
                                 entry.autodrain();
                             }
@@ -67,16 +74,16 @@ exports.processScene = (scene, res) => {
                         .promise().then(() => {
                             if(overlay) {
                                 // Update image references in overlay.html
-                                fs.readFile('./overlays/' + scene + '/overlay.html', 'utf-8', (err, data) => {
+                                fs.readFile('./scenes/' + scene + '/overlay.html', 'utf-8', (err, data) => {
                                     if(!err) {
                                         // Update img references
-                                        var newText = data.replace(/.?\/?img/gm, "../img/" + scene);
+                                        var newText = data.replace(/.{1}\/{1}img/gm, "./img/" + scene);
                         
-                                        fs.writeFile('./overlays/' + scene + '/overlay.html', newText, 'utf-8', (err) => {
+                                        fs.writeFile('./scenes/' + scene + '/overlay.html', newText, 'utf-8', (err) => {
                                             if(err)
                                                 cleanup(scene, res);
                                             else {
-                                                fs.writeFile('./overlays/' + scene + '/.scene', "{'events':{}}", 'utf-8', (err) => {
+                                                fs.writeFile('./scenes/' + scene + '/.scene', "{\"show\":{},\"hide\": {}}", 'utf-8', (err) => {
                                                     if(err)
                                                         cleanup(scene, res);
                                                     else {

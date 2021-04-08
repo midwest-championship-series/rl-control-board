@@ -159,24 +159,29 @@ const Relay = {
     }
 };
 
-const Game = {
-    getGame: function(callback) {
-        Relay.socket.emit("get game info", callback);
+const Match = {
+    getMatch: function(callback) {
+        Relay.socket.emit("get match info", callback);
     },
     /*
     bestOf
     teamSize
     matchTitle
-    scene
     */
-    updateGame: function(gameOptions, callback) {
+    updateMatch: function(matchOptions, callback) {
         if(Relay.socket && Relay.socket.loggedIn) {
-            Relay.socket.emit("update game info", gameOptions, callback);
+            Relay.socket.emit("update match info", matchOptions, callback);
         } else
             callback({
                 name: "NotLoggedInError",
                 message: "You are not logged in."
             });
+    },
+};
+
+const Game = {
+    getGame: function(callback) {
+        Relay.socket.emit("get game info", callback);
     },
     setHomeTeam: function(tteam, callback) {
         if(Relay.socket && Relay.socket.loggedIn) {
@@ -299,7 +304,7 @@ function removeServerDropdownButton(name) {
 $(() => {
 
     if(ServerManager.getServers().length === 0) {
-        ServerManager.addServer("Main Relay", "ws://127.0.0.1:49322");
+        ServerManager.addServer("Main Relay", "ws://relay.chezy.dev");
         ServerManager.addServer("Local Relay", "ws://localhost:5566");
     }
     

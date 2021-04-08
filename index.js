@@ -1,6 +1,6 @@
 // Local Imports
 require('dotenv').config();
-const { processScene, getScenes } = require('./modules/scenes.js');
+const { processScene, getScenes, updateScene } = require('./modules/scenes.js');
 const { sslRedirect } = require('./modules/ssl');
 const { validateToken } = require('./modules/authentication');
 
@@ -9,7 +9,7 @@ const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fileupload = require('express-fileupload');
-const { access, rmdir, readFileSync } = require('fs');
+const { access, rmdir, readFileSync, existsSync, mkdirSync } = require('fs');
 
 const app = express();
 
@@ -44,7 +44,7 @@ app.get('/overlay', (req, res) => {
             events: {}
         };
         scenes.forEach((entry) => {
-            scenes_obj.events[entry] = JSON.parse(readFileSync("./overlays/" + entry + "/.scene"));
+            scenes_obj.events[entry] = JSON.parse(readFileSync("./scenes/" + entry + "/.scene"));
         });
         if(err)
             return res.status(500).render('overlay/error', {error_msg: err.message});
@@ -62,13 +62,28 @@ app.get('/scenes', (req, res) => {
         else
             return res.status(200).send({scenes: scenes}).end();
     }
-    return res.status(400).end();
+    return res.status(400).send({status:false,message:'User not authenticated'}).end();
 });
 
 app.post('/login', (req, res) => {
     if(req.body.token && validateToken(req.body.token))
         res.send('successful');
     return res.status(400).end();
+});
+
+app.post('/scenes', (req, res) => {
+    if(req.body.token && validateToken(req.body.token)) {
+        // Update .scene file
+        if(!req.body.scene || !req.body.scene_data)
+            return res.status(400).send({status:false,message:'No scene and/or scene_data provided'}).end();
+        
+        let err = updateScene(req.body.scene, JSON.parse(req.body.scene_data));
+        if(err)
+            return res.status(400).send({status:false,message:err.message}).end();
+        else
+            return res.status(200).end();
+    }
+    return res.status(400).send({status:false,message:'User not authenticated'}).end();
 });
 
 app.post('/upload-scene', (req, res) => {
@@ -88,10 +103,12 @@ app.post('/upload-scene', (req, res) => {
                         message: 'File name must be greater than 0'
                     }).end();
 
-                console.log(scene.name);
+                if(!existsSync("./uploads"))
+                    mkdirSync("./uploads");
+                
                 // Only allow zippers
                 if(scene.mimetype === "application/zip") {
-                    scene.mv('./scenes/' + scene.name);
+                    scene.mv('./uploads/' + scene.name);
        
                     // send response
                     return processScene(scene.name.replace(".zip", ""), res);
@@ -102,14 +119,14 @@ app.post('/upload-scene', (req, res) => {
             return res.status(500).send(err).end();
         }
     }
-    return res.status(400).end();
+    return res.status(400).send({status:false,message:'User not authenticated'}).end();
 });
 
 app.post('/remove-scene', (req, res) => {
     if(req.body.token && validateToken(req.body.token)) {
         try {
             let scene = req.body.scene_name;
-            access("./overlays/" + scene, (err) => {
+            access("./scenes/" + scene + "/.scene", (err) => {
                 if(err) {
                     // Scene doesn't exist
                     return res.status(400).send({
@@ -121,7 +138,7 @@ app.post('/remove-scene', (req, res) => {
                     rmdir('./public/img/' + scene, {
                         recursive: true
                     }, () => {
-                        rmdir('./overlays/' + scene, {
+                        rmdir('./scenes/' + scene, {
                             recursive: true
                         }, () => {
                             return res.send({
@@ -137,7 +154,7 @@ app.post('/remove-scene', (req, res) => {
             return res.status(500).send(err).end();
         }
     } else
-        return res.status(400).send().end();
+        return res.status(400).send({status:false,message:'User not authenticated'}).end();
 });
 
 app.listen(process.env.PORT, () => {
