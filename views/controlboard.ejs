@@ -187,6 +187,9 @@
     <body>
         <!-- If we make it to this page, we can assume the user is authenticated. 
             All requests the control board makes require a valid token, otherwise it won't work. -->
+
+        <%- include('screens/loading.ejs'); %>
+        <%- include('screens/reconnecting.ejs'); %>
         
         <!-- top bar -->
         <div id="cbTopbar">

@@ -1,0 +1,1 @@
+{"show":{"event":"game:match_ended","transition":false,"transition_rate":1,"delay":7500},"hide":{"event":"game:initialized","transition":false,"transition_rate":1.25,"delay":500}}

@@ -1,0 +1,45 @@
+<style>
+    #waiting-div {
+        background-color: #BC3232;
+    }
+    .waiting-popup {
+        width: 350px;
+        height: 75px;
+        margin: 20px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 5px 5px 5px #222;
+        -webkit-transition: background-color 0.5s ease-in-out;
+        -moz-transition: background-color 0.5s ease-in-out;
+        -o-transition: background-color 0.5s ease-in-out;
+        -khtml-transition: background-color 0.5s ease-in-out;
+        transition: background-color 0.5s ease-in-out;
+    }
+    .waiting-popup p {
+        margin: 0;
+    }
+</style>
+
+<rl-scene name="WAITING" class="overlay">
+    <div id="waiting-div" class="waiting-popup">
+        <p id="waiting-status" style="font-size:20px;">Relay disconnected.</p>
+        <p id="waiting-connecting" style="font-size: 17px;">Trying to connect...</p>
+    </div>
+</rl-scene>
+
+<script>
+    Relay.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+            document.getElementById('waiting-connecting').style.display = "none";
+            document.getElementById('waiting-status').innerText = "Relay Connected!";
+            document.getElementById('waiting-div').style.backgroundColor = "#4CDB81";
+        } else if(data["status"] !== "INITIALIZED") {
+            document.getElementById('waiting-connecting').style.display = "block";
+            document.getElementById('waiting-status').innerText = "Relay Disconnected.";
+            document.getElementById('waiting-div').style.backgroundColor = "#BC3232";
+        }
+    });
+</script>

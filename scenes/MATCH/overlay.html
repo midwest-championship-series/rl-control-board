@@ -1,0 +1,937 @@
+<style>
+    #match-scene {
+        overflow: hidden;
+    }
+    #match-details {
+        width: 1500px;
+        height: 130px;
+        border: none;
+        position: absolute;
+        top: 30px;
+        left: 0px;
+        background-color: rgba(0, 0, 0, 0);
+        margin: 0px auto;
+        overflow: hidden;
+
+        -ms-transform: scale(0.8);
+        -moz-transform: scale(0.8);
+        -o-transform: scale(0.8);
+        -webkit-transform: scale(0.8);
+        transform: scale(0.8);
+
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+    #match-player {
+        width: 600px;
+        height: 175px;
+        border: none;
+        position: absolute;
+        bottom: 0px;
+        left: 60px;
+        background-color: rgba(0, 0, 0, 0);
+        margin: 0px auto;
+        overflow: hidden;
+
+        -ms-transform: scale(0.8);
+        -moz-transform: scale(0.8);
+        -o-transform: scale(0.8);
+        -webkit-transform: scale(0.8);
+        transform: scale(0.8);
+
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+    #match-statfeed {
+        width: 750px;
+        height: 1080px;
+        border: none;
+        position: absolute;
+        top: 30px;
+        right: 0px;
+        background-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
+        margin-right: -100px;
+
+        -ms-transform: scale(0.8);
+        -moz-transform: scale(0.8);
+        -o-transform: scale(0.8);
+        -webkit-transform: scale(0.8);
+        transform: scale(0.8);
+
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+    #match-boost {
+        width: 260px;
+        height: 260px;
+        border: none;
+        bottom:0px;
+        right:0px;
+        z-index: 9;
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0);
+        margin: 0px auto;
+        overflow: hidden;
+
+        -ms-transform: scale(0.8);
+        -moz-transform: scale(0.8);
+        -o-transform: scale(0.8);
+        -webkit-transform: scale(0.8);
+        transform: scale(0.8);
+
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+
+    .match-player-name {
+        padding-left: 55px !important;
+        padding-top: 7px !important;
+        line-height: 65px;
+        height: 65px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bolder;
+        font-size: 30px !important;
+        text-transform: uppercase;
+        color: white;
+        margin-bottom: 0;
+        margin-left: 16px;
+    }
+
+    #match-boost .col > p, #match-replay .col > p {
+        color: white;
+        font-size: 40px;
+        font-family: 'Montserrat', sans-serif;
+    }
+    #match-player .col > p {
+        color: white;
+        font-size: 40px;
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+        padding-top: 16px;
+    }
+    #match-scoreboard {
+        background-color: black;
+        border-radius: 10px;
+        box-shadow: 6px 6px 5px rgba(0,0,0,0.6);
+    }
+    #match-home-team {
+        background-color: rgb(255, 0, 0);
+        border-bottom-left-radius: 10px;
+        max-height: 75px;
+    }
+    #match-away-team {
+        background-color: rgb(255,0,0);
+        max-height: 75px;
+    }
+    #match-game-score {
+        background-color: rgb(196, 196, 196);
+        text-align: center;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 35px;
+        font-weight: bolder;
+        font-style: italic;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #match-clock {
+        background-color: black;
+        color: rgb(88, 135, 179);
+        border-bottom-right-radius: 10px;
+        border-top-right-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #match-clock p {
+        font-size: 35px;
+        font-weight: bolder;
+        font-family: 'Montserrat', sans-serif;
+        text-align: center;
+        font-style: italic;
+        margin-bottom: 0;
+    }
+    .match-team-name {
+        font-size: 35px;
+        line-height: 52px;
+        min-height: 52px;
+        font-weight: bolder;
+        font-family: 'Montserrat', sans-serif;
+        font-style: italic;
+        align-self: flex-start;
+        padding-left: 20px;
+        color:white;
+        text-transform: uppercase;
+    }
+    #match-home-img, #match-away-img {
+        max-width: 100px;
+        position: relative;
+        bottom: 10px;
+        right: 25px;
+    }
+    .match-series-score-active {
+        background-color: yellow;
+        min-height: 5px;
+        margin-left: 5px;
+        margin-right: 5px; 
+        max-width: 25px;
+        box-shadow: 0 0 5px 2px yellow;
+    }
+    .match-series-score-inactive {
+        background-color: rgb(126, 98, 6);
+        min-height: 5px;
+        margin-left: 5px;
+        margin-right: 5px; 
+        max-width: 25px;
+        box-shadow: 0px 0px 15px rgb(212, 163, 3) inset;
+    }
+    .match-event {
+        margin-top: 30px;
+        padding: 15px;
+        font-weight: 800;
+        font-style: italic;
+        text-transform: uppercase;
+        background: linear-gradient(122deg, #F00 0%, #F00 49%, rgba(0,0,0,1) 51%, rgba(0,0,0,1) 100%);
+        border-radius: 20px;
+        max-height: 80px;
+        max-width: 345px;
+    }
+    #match-statfeed {
+        max-width: 1000px;
+    }
+    .match-event p {
+        color: white;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 18px;
+        margin-bottom:0;
+    }
+    #match-replay {
+        position: absolute;
+        background-color: #00000000;
+        bottom: 75px;
+        left: 50%;
+        transform: translate(-50%, 0px);
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
+    }
+    #match-replay-name {
+        padding-left: 70px;
+        line-height: 65px;
+        height: 65px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bolder;
+        font-size: 30px !important;
+        text-transform: uppercase;
+        color: white;
+        
+    }
+    #match-boomermeter img {
+        filter: grayscale(100%);
+        transition: filter 0.5s linear;
+    }
+    @font-face {
+        font-family: match-boomer;
+        src: url(./img/MATCH/font.ttf);
+    }
+    #match-boomermeter p {
+        font-family: match-boomer;
+        font-size: 75px;
+        padding: 0;
+        margin: 0;
+    }
+    #match-boomermeter {
+        box-shadow: 5px 5px 10px black;
+        width: 330px;
+        height: 940px;
+        border: none;
+        position: absolute;
+        bottom: -350px;
+        left: 50px;
+        background-color: rgba(255, 0, 0, 0.5);
+        margin: 0px 0;
+        overflow: hidden;
+
+        -ms-transform: scale(0.6);
+        -moz-transform: scale(0.6);
+        -o-transform: scale(0.6);
+        -webkit-transform: scale(0.6);
+        transform: scale(0.6);
+
+        -ms-transform-origin: 0 0;
+        -moz-transform-origin: 0 0;
+        -o-transform-origin: 0 0;
+        -webkit-transform-origin: 0 0;
+        transform-origin: 0 0;
+    }
+    #match-boomermeter-bar {
+        transition: width 1.5s ease-in-out !important;
+    }
+    #match-meter {
+        width: 650px;
+        height: 60px;
+        position: absolute;
+        top: 490px;
+        left: -250px;
+        transform: rotate(-90deg);
+        box-shadow: -5px 5px 10px black;
+        z-index:3;
+    }
+</style>
+
+<rl-scene hidden id="match-scene" name="MATCH">
+    <div id="match-details">
+        <div id="match-game-info" style="display: block;position: absolute; top:0px; left:30px;background-color: black;border-top-right-radius: 10px; border-top-left-radius: 10px; padding: 5px 15px;">
+            <p style="color: white; font-family:'Montserrat', sans-serif; font-size:16px;" id="match-title">ERROR</p>
+        </div>
+        <div class="container" id="match-scoreboard" style="display: block;position: absolute; top: 30px; left: 30px;z-index: 99;">
+            <div class="row" id="match-main-row" style="overflow: hidden;">
+                <div class="col" id="match-home-team" style="overflow: hidden;">
+                    <!-- left team -->
+                    <div class="row">
+                        <div class="col-2">
+                            <img id="match-home-img" src="./img/MATCH/error.png" />
+                        </div>
+                        <div class="col" id="match-home-name" style="padding-top: 10px; text-align: left; display: flex; flex-direction: column;align-items: center; justify-content: flex-start;">
+                            <p class="match-team-name" id="match-hname">ERROR</p>
+                            <div class="row" id="match-hteam-series" style="width: 80%;position:relative;bottom:18px;right:10px;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2" id="match-game-score">
+                    <!-- game score -->
+                    <span class="align-middle" style="display: inline-block;" id="match-gscore">0 - 0</span>
+                </div>
+                <div class="col" id="match-away-team">
+                    <!-- right team -->
+                    <div class="row">
+                        <div class="col-2">
+                            <img id="match-away-img" src="./img/MATCH/error.png" />
+                        </div>
+                        <div class="col" id="match-away-name" style="padding-top: 10px; text-align: left; display: flex; flex-direction: column;align-items: center; justify-content: flex-start;">
+                            <p class="match-team-name" id="match-aname">ERROR</p>
+                            <div class="row" id="match-ateam-series" style="width: 80%;position:relative;bottom:18px;right:10px;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2" id="match-clock">
+                    <!-- clock -->
+                    <p id="match-clockp">5:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="match-player" class="row" style="display: block;max-height:300px;">
+        <!-- Format: -->
+        <div class="col" style="max-width: 550px;padding-left: 0px;transform: translate(26px, 0px);background: linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 6%, #FF0000 6%, #FF0000 9.6%, rgba(150,0,0,0.5) 10.6%, rgba(150,0,0,0.5) 93.0%, rgba(0,0,0,0) 93%, rgba(0,0,0,0) 100%)">
+            <p id="player-name" class="match-player-name">ERROR</p>
+        </div>
+        <div class="w-100"></div>
+        <div class="col" id="team-color" style="max-width:499px;display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, #FF0000 0%, #FF0000 4%, rgba(150,0,0,0.5) 5%, rgba(150,0,0,0.5) 100%);height:75px;margin-left:37px;margin-right:35px;">
+            <p id="goals" style="margin-left:50px;">0</p>
+            <img src="./img/MATCH/goal.png" style="max-width:50px;margin-right:20px;margin-left:5px;" />
+            <p id="assists">0</p>
+            <img src="./img/MATCH/assist.png" style="max-width:50px;margin-right:20px;margin-left:5px;" />
+            <p id="saves">0</p>
+            <img src="./img/MATCH/save.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+            <p id="shots">0</p>
+            <img src="./img/MATCH/shot.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+        </div>
+        <div class="w-100"></div>
+    </div>
+    <div id="match-statfeed" class="container">
+
+    </div>
+    <div id="match-boost" style="display: block;min-width:200px;min-height:200px;">
+        <match-boost stroke="15" progress="100" radius="140" teamlogo="./img/MATCH/error.png" primarycolor="#FF0000" secondarycolor="#550000" boost="100"></match-boost>
+    </div>
+    <div id="match-boomermeter" style="display: none;">
+        <p style="position: absolute;top:15px;left:20px;z-index:5;">Boomer</p>
+        <p style="position:absolute;top:80px;left:85px;font-size:90px;transform: rotate(25deg);z-index:5;">Meter</p>
+        <p id="match-boomermeter-amount" style="position:absolute;top:830px;left:130px;font-size:40px;z-index:5;">0 MPH</p>
+        <div id="match-meter" class="progress">
+            <div id="match-boomermeter-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%;"></div>
+        </div>
+        <img id="match-boomermeter-feelsbad" src="./img/MATCH/feelsbadman.webp" style="position:absolute;max-width:70px;max-height:70px;top:760px;left:170px;"/>
+        <img id="match-boomermeter-haha" src="./img/MATCH/hahaa.webp" style="position:absolute;max-width:70px;max-height:70px;top:670px;left:170px;"/>
+        <img id="match-boomermeter-kappa" src="./img/MATCH/kappa.webp" style="position:absolute;max-width:70px;max-height:70px;top:580px;left:170px;"/>
+        <img id="match-boomermeter-jebait" src="./img/MATCH/jebaited.webp" style="position:absolute;max-width:70px;max-height:70px;top:490px;left:170px;"/>
+        <img id="match-boomermeter-fourhead" src="./img/MATCH/4head.webp" style="position:absolute;max-width:70px;max-height:70px;top:400px;left:170px;"/>
+        <img id="match-boomermeter-feelsgood" src="./img/MATCH/feelsgoodman.webp" style="position:absolute;max-width:70px;max-height:70px;top:310px;left:170px;"/>
+        <img id="match-boomermeter-poggers" src="./img/MATCH/poggers.webp" style="position:absolute;max-width:70px;max-height:70px;top:220px;left:170px;"/>
+        <img id="match-boomermeter-gachi" src="./img/MATCH/gachi.png" style="position:absolute;max-width:70px;max-height:70px;top:128px;left:37px;z-index:2"/>
+    </div>
+    <div id="match-replay" style="padding: 0;width:235px;display: none;">
+        <div class="col" id="match-replay-grad" style="transform: skew(160deg);background-color: rgba(30, 30, 30, 0.5); background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 25px, #F00 25px, #F00 45px, rgba(150, 0, 0, 0.5)47px, rgba(150,0,0,0.5) 100%);">
+            <p id="match-replay-name">ERROR</p>
+        </div>
+    </div>
+</rl-scene>
+
+<script>
+    class MatchBoost extends HTMLElement {
+        constructor() {
+            super();
+            const stroke = this.getAttribute('stroke');
+            const radius = this.getAttribute('radius');
+            const team_logo = this.getAttribute('teamlogo');
+            const primary_color = this.getAttribute('primarycolor');
+            const secondary_color = this.getAttribute('secondarycolor');
+            const boost = this.getAttribute('boost');
+            const normalizedRadius = radius - stroke * 2;
+            this._circumference = normalizedRadius * 2 * Math.PI;
+
+            this._root = this.attachShadow({mode: 'open'});
+            this._root.innerHTML = `
+            <svg height="${radius * 2}" width="${radius * 2}">
+                <image href="${team_logo}" alt="" height="${Number(radius)+60}" width="${Number(radius)+60}" x="${(Number(radius)-60)/2}" y="${(Number(radius)-60)/2}" style="opacity:0.2"/>
+                <circle id="match-backring" stroke="#000000aa" stroke-dasharray="${this._circumference} ${this._circumference}" style="stroke-dashoffset:0" stroke-width="${stroke}" fill="transparent" r="${normalizedRadius}" cx="${radius}" cy="${radius}" />
+                <circle id="match-ring" stroke="${primary_color}" stroke-dasharray="${this._circumference} ${this._circumference}" style="stroke-dashoffset:${this._circumference}" stroke-width="${stroke}" fill="transparent" r="${normalizedRadius}" cx="${radius}" cy="${radius}" />
+                <circle id="match-team-secondary" cx="50%" cy="50%" r="${normalizedRadius-(stroke/2)}" fill="${secondary_color}99" />
+                <text x="50%" y="50%" text-anchor="middle" fill="white" font-size="75px" font-family="Arial" style="text-shadow: 1px 1px 10px black;" dy=".3em">${boost}</text>
+            </svg>
+
+            <style>
+                match-boost svg {
+                    background-color: #00000000;
+                }
+                #match-backring, #match-ring, #match-team-secondary {
+                    transition: stroke-dashoffset 0.1s;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                }
+            </style>
+            `;
+        }
+        
+        setProgress(percent) {
+            const offset = this._circumference - (percent / 100 * this._circumference);
+            const circle = this._root.querySelector('#match-ring');
+            circle.style.strokeDashoffset = offset; 
+            this._root.querySelector('text').innerHTML = percent;
+        }
+
+        setTeamLogo(href) {
+            this._root.querySelector('image').setAttribute('href', href);
+        }
+
+        setPrimaryColor(color){
+            this._root.querySelector("#match-ring").setAttribute('stroke', color);
+        }
+
+        setSecondaryColor(color){
+            this._root.querySelector('#match-team-secondary').setAttribute('fill', color + "99");
+        }
+
+        setBoost(amount){
+            this._root.querySelector('text').innerHTML = amount;
+            this.setProgress(amount);
+        }
+
+        static get observedAttributes() {
+            return ['progress'];
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+            if (name === 'progress') {
+                this.setProgress(newValue);
+                this._root.querySelector('text').innerHTML = newValue;
+            } else if(name === 'teamlogo') {
+                this._root.querySelector('image').src = newValue;
+            } else if(name == 'primarycolor') {
+                this._root.querySelector("#match-ring").stroke = newValue;
+            } else if(name == 'secondarycolor') {
+                this._root.querySelector('#match-team-secondary').fill = newValue + "99";
+            } else if(name == 'boost') { 
+                this._root.querySelector('text').innerHTML = newValue;
+                this.setProgress(newValue);
+            }
+        }
+    }
+    window.customElements.define('match-boost', MatchBoost);
+
+    let match_lastGoal = "";
+
+    function displayTextWidth(text, font) {
+        let canvas = displayTextWidth.canvas || (displayTextWidth.canvas = document.createElement("canvas"));
+        let context = canvas.getContext("2d");
+        context.font = font;
+        let metrics = context.measureText(text);
+        return metrics.width;
+    }
+
+    function secondsToTime(seconds, showMs) {
+        //return (new Date((seconds) * 1000)).toISOString().substr(showMs ? 17 : 15, 4);
+        var clock_string = "";
+        if(!showMs){
+            var date = new Date(Math.ceil(seconds) * 1000);
+            clock_string += date.getMinutes() + ":" + (date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds());
+        } else {
+            var date = new Date(seconds * 1000);
+            clock_string += date.getSeconds() + "." + date.getMilliseconds().toString().substr(0, 1);
+        }
+        return clock_string;
+    }
+
+    function findPlayer(id) {
+        let player = {};
+        let team = "";
+        Object.values(game["homeTeam"]["players"]).forEach((entry) => {
+            if(entry["id"] === id) {
+                player = entry;
+                team = "homeTeam";
+            }
+        });
+        Object.values(game["awayTeam"]["players"]).forEach((entry) => {
+            if(entry["id"] === id) {
+                player = entry;
+                team = "awayTeam";
+            }
+        });
+        return {player: player, team: team};
+    }
+
+    function testBoost() {
+        let boost = document.querySelector("match-boost");
+        boost.setBoost(100);
+        setTimeout(() => {
+            for(let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    boost.setBoost(100 - ((i + 1)*5));
+                }, i * 100);
+            }
+
+            setTimeout(() => {
+                boost.setBoost(100);
+            }, 2500);
+        }, 2000);
+    }
+
+    function testStatfeed() {
+        var names = ['chezy', 'tero', 'ambrosia', 'jives', 'pace', 'colbs dc', 'mom'];
+        var stats = ['shot', 'demo', 'clear', 'goal', 'win', 'mvp', 'low five', 'assist', 'save', 'epic save', 'Backwards Goal'];
+        var colors = [{r:242, g:88, b:109}, {r:90, g:81, b:254}, {r:20,g:180,b:240}];
+        setInterval(function() {
+            var stat = stats[random(0, stats.length)];
+            if(stat === 'demo'){
+                addDemoEvent(names[random(0, names.length)], colors[random(0, colors.length)], names[random(0, names.length)], colors[random(0, colors.length)]);
+            } else {
+                addEvent(names[random(0, names.length)], colors[random(0, colors.length)], stat);
+            }
+        }, 1500);
+    }
+
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min) ) + min;
+    }
+
+
+    function hexToRgb(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+            return r + r + g + g + b + b;
+        });
+
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function getDarkerColor(rgb){
+        return {r:rgb.r - 103, g: rgb.g - 64, b: rgb.b - 85};
+    }
+
+    function addEvent(player, team_color, stat){
+        var playerWidth = displayTextWidth(player.toUpperCase(), 'italic 800 18pt Montserrat') + 30;
+        var statWidth = displayTextWidth(stat.toUpperCase(), 'italic 800 18pt Montserrat') + 30;
+        var maxWidth = displayTextWidth(player.toUpperCase(), 'italic 800 18pt Montserrat') + displayTextWidth(stat.toUpperCase(), 'italic 800 18pt Montserrat') + 90;
+        var percent = (playerWidth + 15) / maxWidth * 100;
+        var darkened = getDarkerColor(team_color);
+
+        var html = '<div class="col" style="display: flex; align-items: center; justify-content: center;max-width:'+playerWidth+';"><p>'+player+'</p></div>';
+        html += '<div class="col" style="display: flex; align-items: center; justify-content: center;max-width:'+statWidth+';"><p>'+stat+'</p></div>';
+
+        var child = document.createElement('div');
+        child.classList.add('row', 'match-event');
+        child.setAttribute('style', 'margin-left: auto; margin-right: 0; max-width: '+maxWidth+' !important; background: linear-gradient(110deg, rgba('+team_color.r+','+team_color.g+','+team_color.b+',1) 0%, rgba('+darkened.r+','+darkened.g+','+darkened.b+',1) '+percent+'%, rgba(0,0,0,1) '+(percent+2)+'%, rgba(0,0,0,1) 100%);max-width: 345px;');
+        child.innerHTML = html;
+        document.getElementById('match-statfeed').appendChild(child);
+
+        child.classList.add('animate__animated', 'animate__fadeInLeft');
+
+        setTimeout(function() {
+            child.classList.add('animate__animated', 'animate__fadeOutRight');
+
+            child.addEventListener('animationend', () => {
+                child.remove();
+            });
+        }, 4000);
+    }
+
+    function addDemoEvent(player1, team_color1, player2, team_color2) {
+        var player1Width = displayTextWidth(player1.toUpperCase(), 'italic 800 18pt Montserrat') + 30;
+        var player2Width = displayTextWidth(player2.toUpperCase(), 'italic 800 18pt Montserrat') + 30;
+        var statWidth = displayTextWidth('DEMO', 'italic 800 18pt Montserrat') + 30;
+        var maxWidth = player1Width + player2Width + statWidth + 35;
+
+        var percent1 = (player1Width + 15) / maxWidth * 100;
+        var percent2 = (player1Width + statWidth + 15) / maxWidth * 100;
+
+        var darkened1 = getDarkerColor(team_color1);
+        var darkened2 = getDarkerColor(team_color2);
+
+        var html = '<div class="col" style="display: flex; align-items: center; justify-content: center;max-width:'+player1Width+';"><p>'+player1+'</p></div>';
+        html += '<div class="col" style="display: flex; align-items: center; justify-content: center;max-width:'+statWidth+';"><p>DEMO</p></div>';
+        html += '<div class="col" style="display: flex; align-items: center; justify-content: center;max-width:'+player2Width+';"><p>'+player2+'</p></div>';
+
+        var child = document.createElement('div');
+        child.classList.add('row', 'match-event');
+        child.setAttribute('style', 'margin-left: auto; margin-right: 0; max-width: '+maxWidth+' !important; background: linear-gradient(110deg, rgba('+team_color1.r+','+team_color1.g+','+team_color1.b+',1) 0%, rgba('+darkened1.r+','+darkened1.g+','+darkened1.b+',1) '+percent1+'%, rgba(0,0,0,1) '+(percent1+2)+'%, rgba(0,0,0,1) '+(percent2-2)+'%, rgba('+team_color2.r+','+team_color2.g+','+team_color2.b+',1) '+percent2+'%, rgba('+darkened2.r+','+darkened2.g+','+darkened2.b+',1) 100%);max-width: 345px;');
+        child.innerHTML = html;
+        document.getElementById('match-statfeed').appendChild(child);
+
+        child.classList.add('animate__animated', 'animate__fadeInLeft');
+
+        setTimeout(function() {
+            child.classList.add('animate__animated', 'animate__fadeOutRight');
+
+            child.addEventListener('animationend', () => {
+                child.remove();
+            });
+        }, 4000);
+    }
+
+    function resetMeter(){
+        document.querySelector("#match-boomermeter-feelsbad").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-haha").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-kappa").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-jebait").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-fourhead").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-feelsgood").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-poggers").style.filter = "grayscale(100%)";
+        document.querySelector("#match-boomermeter-gachi").style.filter = "grayscale(100%)";
+        document.querySelector("#match-meter div").style.width = "0%";
+        document.getElementById('match-boomermeter-amount').innerText = "0 MPH";
+    }
+    
+    function animate(speed) {
+        document.querySelector('#match-meter div').style.width = speed + "%";
+        document.getElementById('match-boomermeter-amount').innerText = speed + " MPH";
+
+        if(speed >= 8) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-feelsbad").style.filter = "grayscale(0%)";
+            }, 150);
+        }
+        if(speed >= 22) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-haha").style.filter = "grayscale(0%)";
+            }, 150 * 2);
+        }
+        if(speed >= 35) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-kappa").style.filter = "grayscale(0%)";
+            }, 150 * 3);
+        }
+        if(speed >= 50) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-jebait").style.filter = "grayscale(0%)";
+            }, 150 * 4);
+        }
+        if(speed >= 64) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-fourhead").style.filter = "grayscale(0%)";
+            }, 150 * 5);
+        }
+        if(speed >= 77) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-feelsgood").style.filter = "grayscale(0%)";
+            }, 150 * 6);
+        }
+        if(speed >= 90) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-poggers").style.filter = "grayscale(0%)";
+            }, 150 * 7);
+        }
+        if(speed >= 100) {
+            setTimeout(function() {
+                document.querySelector("#match-boomermeter-gachi").style.filter = "grayscale(0%)";
+                // do an explosion or something cool, a 100 is hard enough
+            }, 150 * 8);
+        }
+    }
+
+    let match_displayConversionMap = {
+        "Shot on Goal": "Shot",
+        "Demolition": "Demo",
+        "Clear Ball": "Clear",
+    }
+
+    var match_homeTeamPrimary = "#0099FF";
+    var match_awayTeamPrimary = "#FF9900";
+    var match_homeTeamSecondary = "#FFFFFF";
+    var match_awayTeamSecondary = "#FFFFFF";
+    var match_lastGoalSpeed = 0;
+
+    $(() => {
+
+        //testStatfeed();
+        //testBoost();
+
+        Relay.addListener("status_update", (data) => {
+            if(data["status"] === "INITIALIZED") {
+                
+                // match-boomermeter
+                Relay.socket.on("game event", (ev) => {
+                    if(ev["event"] === "game:replay_start") {
+                        document.getElementById("match-boomermeter").style.display = "block";
+                        document.getElementById("match-boomermeter-amount").innerText = match_lastGoalSpeed + " MPH";
+                        setTimeout(() => {
+                            animate(match_lastGoalSpeed);
+                        }, 1500);
+                    } else if(ev["event"] === "game:replay_end") {
+                        animateCSS('#match-boomermeter', 'fadeOut').then((message) => {
+                            document.getElementById('match-boomermeter').style.display = "none";
+                            resetMeter();
+                        });
+                    } else if(ev["event"] === "game:goal_scored") {
+                        match_lastGoalSpeed = ev["data"]["ball_speed"];
+                        let { player, team } = findPlayer(ev["data"]["scorer"]["id"]);
+                        document.getElementById("match-boomermeter").style.backgroundColor = team === "homeTeam" ? match_homeTeamPrimary : match_awayTeamPrimary;
+                        document.getElementById("match-boomermeter-bar").style.backgroundColor = team === "homeTeam" ? match_homeTeamSecondary : match_awayTeamSecondary;
+                    }
+                });
+
+                // match-replay
+                Relay.socket.on("update state", (match) => {
+                    let game = match["game"];
+                    if(!game["hasGame"] || !game["inReplay"]) 
+                        document.getElementById("match-replay").style.display = "none";
+                    else {
+                        document.getElementById("match-replay").style.display = "block";
+                    }
+                });
+
+                // match-replay
+                Relay.socket.on("game event", (ev) => {
+                    if(ev["event"] === "game:replay_end"){
+                        animateCSS('#match-replay', 'fadeOut').then((message) => {
+                            document.getElementById('match-replay').style.display = "none";
+                        });
+                    } else if(ev["event"] === "game:goal_scored") {
+                        let data = ev["data"];
+                        document.getElementById('match-replay-name').innerText = data['scorer']['name'];
+
+                        let { player, team } = findPlayer(data['scorer']['id']);
+                        document.getElementById("match-replay-grad").style.background = "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 25px, "+(team === "homeTeam" ? match_homeTeamPrimary : match_awayTeamPrimary)+" 25px, "+(team === "homeTeam" ? match_homeTeamPrimary : match_awayTeamPrimary)+" 45px, rgba(0, 0, 0, 0.5)47px, rgba(0,0,0,0.5) 100%)";
+                        
+                        var width = displayTextWidth(data['scorer']['name'], '30pt Montserrat');
+                        document.getElementById("match-replay").style.width = (width + 140) + "px";
+
+                        // Transition
+                        let midpoint = transition(1.4);
+
+                        setTimeout(() => {
+                            document.getElementById("match-replay").style.display = "block";
+                        }, midpoint * 1000);
+                    }
+                });
+
+                // match-statfeed
+                Relay.socket.on("game event", (ev) => {
+                    if(ev["event"] === "game:statfeed_event") {
+                        var data = ev["data"];
+                        var stat = match_displayConversionMap[data["type"]] || data["type"];
+
+                        if(stat === "Demo") {
+                            let { mainTarget, mainTeam } = findPlayer(data['main_target']['id']);
+                            let { secondaryTarget, secondaryTeam } = findPlayer(data['main_target']['id']);
+                            addDemoEvent(mainTarget['name'], mainTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), secondaryTarget['name'], secondaryTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary));
+                        } else {
+                            let { player, team } = findPlayer(data['main_target']['id']);
+                            addEvent(player['name'], team === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), stat);
+                        }
+                    }
+                })
+
+                // match-statfeed
+                Relay.socket.on("update state", (match) => {
+                    if(match["game"] && match["game"]["homeTeam"]) {
+                        match_homeTeamPrimary = match["game"]["homeTeam"]["colors"]["homePrimary"];
+                        match_awayTeamPrimary = match["game"]["awayTeam"]["colors"]["awayPrimary"];
+                        match_homeTeamSecondary = match["game"]["homeTeam"]["colors"]["homeSecondary"];
+                        match_awayTeamSecondary = match["game"]["awayTeam"]["colors"]["awaySecondary"];
+                    }
+                });
+
+                // match-details
+                Relay.socket.on("update state", (match) => {
+                    let game = match["game"];
+                    if(!game["hasGame"]) {
+                        document.getElementById("match-details").style.display = "none";
+                    } else {
+                        var clock = (game['isOT'] ? '+' : '') + secondsToTime(game["time"], game["time"] <= 60 && !game["isOT"]);
+                        document.getElementById("match-clockp").innerText = clock;
+                        document.getElementById("match-gscore").innerText = game["homeTeam"]["score"] + " - " + game["awayTeam"]["score"];
+                        document.getElementById("match-title").innerText = match["matchTitle"];
+                        document.getElementById("match-home-team").style.backgroundColor = game["homeTeam"]["colors"]["homePrimary"];
+                        document.getElementById("match-away-team").style.backgroundColor = game["awayTeam"]["colors"]["awayPrimary"];
+                        
+                        var homeName = game["homeTeam"]["name"];
+                        var awayName = game["awayTeam"]["name"];
+
+
+                        var homeWidth = displayTextWidth(homeName, 'italic 800 35pt Montserrat');
+                        var homeSize = 36;
+                        while(homeWidth >= 355) {
+                            homeSize--;
+                            homeWidth = displayTextWidth(homeName, 'italic 800 ' + homeSize + 'pt Montserrat');
+                        }
+                        
+                        var awayWidth = displayTextWidth(awayName, 'italic 800 35pt Montserrat');
+                        awaySize = 36;
+                        while(awayWidth >= 355) {
+                            awaySize--;
+                            awayWidth = displayTextWidth(awayName, 'italic 800 ' + awaySize + 'pt Montserrat');
+                        }
+
+                        document.getElementById('match-aname').innerText = awayName;
+                        document.getElementById('match-aname').style.fontSize = awaySize + "px";
+                        document.getElementById('match-hname').innerText = homeName;
+                        document.getElementById('match-hname').style.fontSize = homeSize + "px";
+
+                        document.getElementById("match-home-img").src = game["homeTeam"]["avatar"];
+                        document.getElementById("match-away-img").src = game["awayTeam"]["avatar"];
+                        document.getElementById("postgame-hteam-series").innerHTML = "";
+                        document.getElementById("postgame-ateam-series").innerHTML = "";
+                        
+                        let stw = Math.ceil(match["bestOf"] / 2);
+                        for(var i = 1; i <= stw; i++){
+                            if(game["homeTeam"]["series"] >= i) {
+                                document.getElementById('match-hteam-series').innerHTML += '<div class="col match-series-score-active"></div>';
+                            } else {
+                                document.getElementById('match-hteam-series').innerHTML += '<div class="col match-series-score-inactive"></div>';
+                            }
+                            if(game["awayTeam"]["series"] >= i) {
+                                document.getElementById('match-ateam-series').innerHTML += '<div class="col match-series-score-active"></div>';
+                            } else {
+                                document.getElementById('match-ateam-series').innerHTML += '<div class="col match-series-score-inactive"></div>';
+                            }
+                        }
+                    }
+                });
+
+                // match-details
+                Relay.socket.on("game event", (ev) => {
+                    if(ev.event === "game:match_ended") {
+                        animateCSS("#match-game-info", "fadeOut").then((message) => {
+                            console.log('animationend: setting scoreboard display to none');
+                            document.getElementById('match-game-info').style.display = "none";
+                        });
+                        animateCSS("#match-scoreboard", "fadeOut").then((message) => {
+                            console.log('animationend: setting scoreboard display to none');
+                            document.getElementById('match-scoreboard').style.display = "none";
+                        });
+                    } else if(ev.event === "game:initialized") {
+                        document.getElementById('match-scoreboard').style.display = "block";
+                        document.getElementById('match-game-info').style.display = "block";
+
+                        animateCSS("#match-game-info", "backInLeft");
+                        animateCSS("#match-scoreboard", "fadeIn");
+                    }
+                });
+
+                // match-player
+                Relay.socket.on("update state", (match) => {
+                    let game = match["game"];
+                    if(game["hasGame"]) {
+                        if(!game["hasTarget"])
+                            document.getElementById("match-player").style.display = "none";
+                        else if(game["inReplay"])
+                            document.getElementById("match-player").style.display = "none";
+                        else {
+                            document.getElementById("match-player").style.display = "block";
+                            var { player, team } = findPlayer(game["target"]);
+
+                            let html = `
+                                <div class="col" style="max-width: 550px;padding-left: 0px;transform: translate(26px, 0px);background: linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 6%, ${game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]} 6%, ${game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]} 9.6%, rgba(30,30,30,0.5) 10.6%, rgba(30,30,30,0.5) 93.0%, rgba(0,0,0,0) 93%, rgba(0,0,0,0) 100%)">
+                                    <p class="match-player-name">${player['name']}</p>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col" style="max-width:499px;display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, ${game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]} 0%, ${game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]} 4%, rgba(30,30,30,0.5) 5%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:37px;margin-right:35px;">
+                                    <p style="margin-left:50px;">${player['goals']}</p>
+                                    <img src="./img/MATCH/goal.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+                                    <p>${player['assists']}</p>
+                                    <img src="./img/MATCH/assist.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+                                    <p>${player['saves']}</p>
+                                    <img src="./img/MATCH/save.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+                                    <p>${player['shots']}</p>
+                                    <img src="./img/MATCH/shot.png" style="max-width: 50px;margin-right:20px;margin-left:5px;" />
+                                </div>
+                                <div class="w-100"></div>
+                            `;
+                            document.getElementById('match-player').innerHTML = html;
+                        }
+                    }
+                    else 
+                        document.getElementById("match-player").style.display = "none";
+
+                });
+
+                // match-boost
+                Relay.socket.on("update state", (match) => {
+                    let game = match["game"];
+                    if(!game["hasTarget"] && !game["isReplay"]) {
+                        document.getElementById("match-boost").style.display = "none";
+                    } else {
+                        document.getElementById("match-boost").style.display = "block";
+                        if(game["isReplay"]) {
+                            var boost = document.querySelector('match-boost');
+                            var { player, team } = findPlayer(match_lastGoal);
+                            boost.setBoost(player['boost']);
+                            boost.setPrimaryColor(game[team]["colors"][team === "homeTeam" ? "homeSecondary" : "awaySecondary"]);
+                            boost.setSecondaryColor(game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]);
+                            boost.setTeamLogo(game[team]["avatar"]);
+                        } else if(game["hasTarget"]) {
+                            var boost = document.querySelector('match-boost');
+                            var { player, team } = findPlayer(game["target"]);
+                            boost.setBoost(player['boost']);
+                            boost.setPrimaryColor(game[team]["colors"][team === "homeTeam" ? "homeSecondary" : "awaySecondary"]);
+                            boost.setSecondaryColor(game[team]["colors"][team === "homeTeam" ? "homePrimary" : "awayPrimary"]);
+                            boost.setTeamLogo(game[team]["avatar"]);
+                        }
+                    }
+                });
+
+                // match-boost
+                Relay.socket.on("game event", (data) => {
+                    if(data["event"] === "game:goal_scored") {
+                        match_lastGoal = data["data"]["scorer"]["id"];
+                    }
+                });
+            }
+        });
+    });
+</script>

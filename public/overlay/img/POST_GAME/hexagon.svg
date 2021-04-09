@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="115pt" height="99pt" viewBox="0 0 115 99" version="1.1">
+<defs>
+<filter id="alpha" filterUnits="objectBoundingBox" x="0%" y="0%" width="100%" height="100%">
+  <feColorMatrix type="matrix" in="SourceGraphic" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0"/>
+</filter>
+<mask id="mask0">
+  <g filter="url(#alpha)">
+<rect x="0" y="0" width="115" height="99" style="fill:rgb(0%,0%,0%);fill-opacity:0.2;stroke:none;"/>
+  </g>
+</mask>
+<clipPath id="clip1">
+  <rect x="0" y="0" width="115" height="99"/>
+</clipPath>
+<g id="surface5" clip-path="url(#clip1)">
+<path style="fill:none;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.799592 22.000513 L 37.299592 29.199416 L 37.299592 43.700718 L 24.799592 50.899621 L 12.299592 43.700718 L 12.299592 29.199416 Z M 24.799592 22.000513 " transform="matrix(2.3,0,0,2.302326,0,0)"/>
+<path style="fill:none;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.799592 22.000513 L 37.299592 29.199416 L 37.299592 43.700718 L 24.799592 50.899621 L 12.299592 43.700718 L 12.299592 29.199416 Z M 24.799592 22.000513 " transform="matrix(2.3,0,0,2.302326,57.5,0)"/>
+<path style="fill:none;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.799592 22.000513 L 37.299592 29.199416 L 37.299592 43.700718 L 24.799592 50.899621 L 12.299592 43.700718 L 12.299592 29.199416 Z M 24.799592 22.000513 " transform="matrix(2.3,0,0,2.302326,-57.5,0)"/>
+<path style="fill:none;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.799592 22.000308 L 37.299592 29.199211 L 37.299592 43.700513 L 24.799592 50.899416 L 12.299592 43.700513 L 12.299592 29.199211 Z M 24.799592 22.000308 " transform="matrix(2.3,0,0,2.302326,28.75,-49.960465)"/>
+<path style="fill:none;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:4;" d="M 24.799592 22.000308 L 37.299592 29.199211 L 37.299592 43.700513 L 24.799592 50.899416 L 12.299592 43.700513 L 12.299592 29.199211 Z M 24.799592 22.000308 " transform="matrix(2.3,0,0,2.302326,-28.75,-49.960465)"/>
+</g>
+</defs>
+<g id="surface1">
+<use xlink:href="#surface5" mask="url(#mask0)"/>
+</g>
+</svg>

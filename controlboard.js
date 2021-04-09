@@ -66,8 +66,9 @@ const Relay = {
         Relay.socketStatus = SocketStatus.CONNECTING;
         Relay.statusUpdate(SocketStatus.CONNECTING, server);
 
+        // Modify this to be the same as overlay!
         Relay.socket = io(server, {
-            reconnection: false,
+            reconnection: true,
             transports: ['websocket'], // long polling doesn't work due to cors or some shiet
             upgrade: false
         });
@@ -100,35 +101,6 @@ const Relay = {
                 Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
                 ServerManager.connectedServer = undefined;
             });
-
-            Relay.socket.on("game event", (data) => {
-                
-            });
-
-            Relay.socket.on("team removed", (name) => {
-
-            });
-
-            Relay.socket.on("team added", (team) => {
-
-            });
-
-            Relay.socket.on("team updated", (name, team) => {
-
-            });
-
-            Relay.socket.on("teams refreshed", (teams) => {
-
-            });
-
-            /*
-            data:
-                - teamnum
-                - team
-            */
-            Relay.socket.on("team set", (data) => {
-
-            });
         });
 
         Relay.socket.on("connect_error", (err) => {
@@ -159,23 +131,29 @@ const Relay = {
     }
 };
 
-const Game = {
-    getGame: function(callback) {
-        Relay.socket.emit("get game info", callback);
+const Match = {
+    getMatch: function(callback) {
+        Relay.socket.emit("get match info", callback);
     },
     /*
     bestOf
     teamSize
     matchTitle
     */
-    updateGame: function(gameOptions, callback) {
+    updateMatch: function(matchOptions, callback) {
         if(Relay.socket && Relay.socket.loggedIn) {
-            Relay.socket.emit("update game info", gameOptions, callback);
+            Relay.socket.emit("update match info", matchOptions, callback);
         } else
             callback({
                 name: "NotLoggedInError",
                 message: "You are not logged in."
             });
+    },
+};
+
+const Game = {
+    getGame: function(callback) {
+        Relay.socket.emit("get game info", callback);
     },
     setHomeTeam: function(tteam, callback) {
         if(Relay.socket && Relay.socket.loggedIn) {
@@ -298,7 +276,7 @@ function removeServerDropdownButton(name) {
 $(() => {
 
     if(ServerManager.getServers().length === 0) {
-        ServerManager.addServer("Main Relay", "ws://127.0.0.1:49322");
+        ServerManager.addServer("Main Relay", "ws://relay.chezy.dev");
         ServerManager.addServer("Local Relay", "ws://localhost:5566");
     }
     

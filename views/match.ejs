@@ -92,7 +92,7 @@
             teamSize: Number(document.getElementById("team-size-input").value),
             bestOf: Number(document.getElementById("best-of-input").value)
         }
-        Game.updateGame(update, (err, reply) => {
+        Match.updateMatch(update, (err, reply) => {
             if(err) {
                 sendNotification("Couldn't update game info.");
                 console.log(err);
@@ -134,12 +134,13 @@
                     mCurTeamList = teams;
                     matchPopulateSelects(mCurTeamList);
 
-                    Relay.socket.emit("get game info", (game, err) => {
+                    Relay.socket.emit("get match info", (match, err) => {
                         if(!err) {
-                            console.log(game);
-                            document.getElementById("match-title-input").value = game.matchTitle ?? "Minnesota Championship Series";
-                            document.getElementById("best-of-input").value = game.bestOf ?? 5;
-                            document.getElementById("team-size-input").value = game.teamSize ?? 3;
+                            console.log(match);
+                            let game = match.game ?? {};
+                            document.getElementById("match-title-input").value = match.matchTitle ?? "Minnesota Championship Series";
+                            document.getElementById("best-of-input").value = match.bestOf ?? 5;
+                            document.getElementById("team-size-input").value = match.teamSize ?? 3;
                             document.getElementById("home-team-input").value = (game.homeTeam ? game.homeTeam.name : "-") ?? "-";
                             document.getElementById("away-team-input").value = (game.awayTeam ? game.awayTeam.name : "-") ?? "-";
                             document.getElementById("home-team-score-input").value = (game.homeTeam ? game.homeTeam.series : 0) ?? 0;
@@ -151,28 +152,40 @@
                     console.log(err);
             });
 
-            Relay.socket.on("game info updated", (game) => {
-                console.log(game);
-                sendNotification("Game info updated!");
-                document.getElementById("match-title-input").value = game.matchTitle ?? "Minnesota Championship Series";
-                document.getElementById("best-of-input").value = game.bestOf ?? 5;
-                document.getElementById("team-size-input").value = game.teamSize ?? 3;
+            Relay.socket.on("match info updated", (match) => {
+                console.log(match);
+                sendNotification("Match info updated!");
+                document.getElementById("match-title-input").value = match.matchTitle ?? "Minnesota Championship Series";
+                document.getElementById("best-of-input").value = match.bestOf ?? 5;
+                document.getElementById("team-size-input").value = match.teamSize ?? 3;
             });
 
             Relay.socket.on("team removed", (name) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
                 mCurTeamList = mCurTeamList.filter(x => x.name !== name);
                 matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
             });
 
             Relay.socket.on("team added", (team) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
                 mCurTeamList.push(team);
                 matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
             });
 
             Relay.socket.on("team updated", (name, team) => {
+                let hSelected = document.getElementById('home-team-input').value;
+                let aSelected = document.getElementById('away-team-input').value;
                 mCurTeamList = mCurTeamList.filter(x => x.name !== name);
                 mCurTeamList.push(team);
                 matchPopulateSelects(mCurTeamList);
+                document.getElementById('home-team-input').value = hSelected;
+                document.getElementById('away-team-input').value = aSelected;
             });
 
             Relay.socket.on("team set", (data) => {
@@ -184,6 +197,11 @@
                     document.getElementById("away-team-input").value = data.team.name;
                     document.getElementById("away-team-score-input").value = data.team.series;
                 }
+            });
+
+            Relay.socket.on("game ended", (match) => {
+                document.getElementById("home-team-score-input").value = match.game.homeTeam.series;
+                document.getElementById("away-team-score-input").value = match.game.awayTeam.series;
             });
         }
     });

@@ -1,0 +1,53 @@
+<!-- "SIR, WE LOST CONNECTION! ALERT THE USER IMMEDIATELY!"
+    thats the idea for this thing -->
+
+<style>
+    #reconnecting-container {
+        min-width: 100%;
+        min-height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 99;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(108, 172, 220, .8);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        opacity: 0;
+        transition: opacity 2s;
+    }
+    #disconnect-button {
+        padding: 10px 40px;
+    }
+</style>
+
+<div id="reconnecting-container">
+    <p style="color: #f90;font-size: 32px;">Reconnecting...</p>
+    <button id="disconnect-button" onclick="disconnect()">Disconnect</button>
+</div>
+
+<script>
+
+
+    ServerManager.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+            document.getElementById("reconnecting-container").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("reconnecting-container").style.display = "none";
+            }, 2000);
+            document.body.style.overflow = "auto";
+        } else if(data["status"] === "DISCONNECTED"){
+            document.getElementById("reconnecting-container").style.display = "flex";
+            document.getElementById("reconnecting-container").style.opacity = "1";
+            document.body.style.overflow = "hidden";
+        }
+    });
+
+    function disconnect() {
+        setCookie("current_server", "");
+        location.reload();
+    }
+</script>
