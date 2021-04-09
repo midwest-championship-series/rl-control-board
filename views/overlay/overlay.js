@@ -50,14 +50,15 @@ const Relay = {
             Relay.statusUpdate(SocketStatus.CONNECTED, server);
         });
 
-        this.statusUpdate("INITIALIZED", server);
     },
     addListener: function(event, cb) {
+        console.log("Adding listener for " + event);
         if(event === "status_changed")
-            Relay.onStatusChangedListeners.push(cb);
+            this.onStatusChangedListeners.push(cb);
     },
     statusUpdate: function(status, server) {
-        Relay.onStatusChangedListeners.forEach((callback) => {
+        console.log("Sending " + status);
+        this.onStatusChangedListeners.forEach((callback) => {
             if(callback instanceof Function){
                 callback({"status": status, "server": server});
             }
@@ -119,7 +120,7 @@ function updateScene(scene, delay, do_transition, transition_rate, show) {
                 setTimeout(function() {
                     document.querySelectorAll('rl-scene').forEach((entry) => {
                         if(entry.getAttribute("name") === scene)
-                            show ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
+                            show === "show" ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
                     });
                 }, halfLength * 1000);
                 setTimeout(function() {
@@ -128,14 +129,14 @@ function updateScene(scene, delay, do_transition, transition_rate, show) {
             } else {
                 document.querySelectorAll('rl-scene').forEach((entry) => {
                     if(entry.getAttribute("name") === scene) 
-                        show ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
+                        show === "show" ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
                 });
                 transitioning = false;
             }   
         } else {
             document.querySelectorAll('rl-scene').forEach((entry) => {
                 if(entry.getAttribute("name") === scene)
-                    show ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
+                    show === "show" ? entry.removeAttribute("hidden") : entry.setAttribute("hidden", "");
             });
         }
     }, delay);
@@ -144,32 +145,23 @@ function updateScene(scene, delay, do_transition, transition_rate, show) {
 $(() => {
                 
     Relay.addListener("status_changed", (data) => {
-        if(data["status"] === "CONNECTED") {
-            Relay.socket.emit("activate", Relay.id, (status) => {
-                if(status !== "good") {
-                    console.log("deactivating");
-                    setCookie("token", "");
-                    setCookie("name", "");
-                    setCookie("server", "");
-                    location.reload();
-                }
-            });
+        if(data["status"] === "INITIALIZED") {
 
             Relay.socket.on("match ended", (match) => {
                 Object.entries(scenes).forEach(([key, value]) => {
                     if(value.show.event === "mncs:match_ended")
-                        updateScene(key, value.show.delay, value.show.transition, value.show.transition_rate, true);
+                        updateScene(key, value.show.delay, value.show.transition, value.show.transition_rate, "show");
                     else if(value.hide.event === "mncs:match_ended")
-                        updateScene(key, value.hide.delay, value.hide.transition, value.hide.transition_rate, false);
+                        updateScene(key, value.hide.delay, value.hide.transition, value.hide.transition_rate, "hide");
                 });
             });
 
             Relay.socket.on("game event", (ev) => {
                 Object.entries(scenes).forEach(([key, value]) => {
                     if(value.show.event === ev.event)
-                        updateScene(key, value.show.delay, value.show.transition, value.show.transition_rate, true);
+                        updateScene(key, value.show.delay, value.show.transition, value.show.transition_rate, "show");
                     else if(value.hide.event === ev.event)
-                        updateScene(key, value.hide.delay, value.hide.transition, value.hide.transition_rate, false);
+                        updateScene(key, value.hide.delay, value.hide.transition, value.hide.transition_rate, "hide");
                 });
             });
 
@@ -181,11 +173,11 @@ $(() => {
                     - delay: number (milliseconds)
             */
             Relay.socket.on("show scene", (data) => {
-                updateScene(data.scene, data.delay, data.transition, data.transition_rate, true);
+                updateScene(data.scene, data.delay, data.transition, data.transition_rate, "show");
             });
 
             Relay.socket.on("hide scene", (data) => {
-                updateScene(data.scene, data.delay, data.transition, data.transition_rate, false);
+                updateScene(data.scene, data.delay, data.transition, data.transition_rate, "hide");
             });
 
             Relay.socket.on("deactivate", (id) => {
@@ -199,8 +191,21 @@ $(() => {
                 }
             });
         }
+        else if(data["status"] === "CONNECTED"){
+            Relay.socket.emit("activate", Relay.id, (status) => {
+                if(status !== "good") {
+                    console.log("deactivating");
+                    setCookie("token", "");
+                    setCookie("name", "");
+                    setCookie("server", "");
+                    location.reload();
+                }
+            });
+        }
     });
 
-    console.log("Initializing " + getCookie("server"));
     Relay.init(getCookie("server"));
+    setTimeout(() => {
+        Relay.statusUpdate("INITIALIZED", Relay.server);
+    }, 1000);
 });

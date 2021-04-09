@@ -109,6 +109,8 @@ const Relay = {
             Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
             ServerManager.connectedServer = undefined;
         });
+
+        this.statusUpdate("INITIALIZED", ServerManager.connectedServer);
     },
     switchServer: function(server) {
         if(Relay.socketStatus === SocketStatus.CONNECTED) {
@@ -294,7 +296,7 @@ $(() => {
             $('.cbCurrentServerIP').each(function() {
                 $(this).text("");
             });
-        } else {
+        } else if(data["status"] !== "INITIALIZED"){
             UIkit.notification("["+data["server"]+"] " + data["status"], {pos: 'bottom-right'});
             document.getElementById("server-dropdown-status").style.display = "inline";
             if(data["status"] === "CONNECTING") {
