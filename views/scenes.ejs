@@ -49,57 +49,64 @@
                 <option value="-" selected> --- Select Scene --- </option>
             </select>
             <div hidden id="scene-hide-show-div" style="width: 500px;max-width:500px;margin-top:30px;">
-                <p style="display: inline-block;margin-bottom:5px;">Show:</p>
-                <select id="scene-show-event" class="uk-select"  style="display: inline-block;width: 100%;">
-                    <option value="-" selected> --- Select Event --- </option>
-                    <option>game:match_created</option>
-                    <option>game:initialized</option>
-                    <option>game:pre_countdown_begin</option>
-                    <option>game:post_countdown_begin</option>
-                    <option>game:goal_scored</option>
-                    <option>game:replay_start</option>
-                    <option>game:replay_will_end</option>
-                    <option>game:replay_end</option>
-                    <option>game:match_ended</option>
-                    <option>game:podium_start</option>
-                    <option>game:replay_created</option>
-                    <option>mncs:match_ended</option>
-                </select>
-                <div class="uk-width-1-1">
-                    <input id="scene-show-transition" style="display: inline-block;" class="uk-checkbox" onchange="!this.checked ? document.getElementById('scene-show-transition-rate').setAttribute('disabled', '') : document.getElementById('scene-show-transition-rate').removeAttribute('disabled')" type="checkbox" />
-                    <p style="display: inline-block;">Transition?</p>
-                    <input disabled id="scene-show-transition-rate" class="uk-range" oninput="document.getElementById('show-rate-display').innerText = this.value + 'x'" style="display: inline-block;max-width:300px;" type="range" value="1" min="0.25" max="4" step="0.25" />
-                    <p id="show-rate-display" style="display: inline-block;">1.0x</p>
+                <p style="display: inline-block;margin-bottom:5px;">Add Show Event? </p>
+                <input id="scene-show-event-check" style="display: inline-block;" class="uk-checkbox" type="checkbox" onchange="!this.checked ? document.getElementById('scene-group-show-event').setAttribute('hidden', '') : document.getElementById('scene-group-show-event').removeAttribute('hidden')" />
+                <div hidden id="scene-group-show-event">
+                    <select id="scene-show-event" class="uk-select"  style="display: inline-block;width: 100%;">
+                        <option value="-" selected> --- Select Event --- </option>
+                        <option>game:match_created</option>
+                        <option>game:initialized</option>
+                        <option>game:pre_countdown_begin</option>
+                        <option>game:post_countdown_begin</option>
+                        <option>game:goal_scored</option>
+                        <option>game:replay_start</option>
+                        <option>game:replay_will_end</option>
+                        <option>game:replay_end</option>
+                        <option>game:match_ended</option>
+                        <option>game:podium_start</option>
+                        <option>game:replay_created</option>
+                        <option>mncs:match_ended</option>
+                    </select>
+                    <div class="uk-width-1-1">
+                        <input id="scene-show-transition" style="display: inline-block;" class="uk-checkbox" onchange="!this.checked ? document.getElementById('scene-show-transition-rate').setAttribute('disabled', '') : document.getElementById('scene-show-transition-rate').removeAttribute('disabled')" type="checkbox" />
+                        <p style="display: inline-block;">Transition?</p>
+                        <input disabled id="scene-show-transition-rate" class="uk-range" oninput="document.getElementById('show-rate-display').innerText = this.value + 'x'" style="display: inline-block;max-width:300px;" type="range" value="1" min="0.25" max="4" step="0.25" />
+                        <p id="show-rate-display" style="display: inline-block;">1.0x</p>
+                    </div>
+                    <div class="uk-width-1-1">
+                        <p style="display: inline-block;">Delay (ms) </p>
+                        <input id="scene-show-delay" style="max-width:360px;margin-left:5px;" type="text" class="uk-input" style="display: inline-block" value="0" placeholder="Delay" />
+                    </div>
                 </div>
-                <div class="uk-width-1-1">
-                    <p style="display: inline-block;">Delay (ms) </p>
-                    <input id="scene-show-delay" style="max-width:360px;margin-left:5px;" type="text" class="uk-input" style="display: inline-block" value="0" placeholder="Delay" />
-                </div>
-                <p style="display: inline-block;margin-bottom:5px;">Hide:</p>
-                <select id="scene-hide-event" class="uk-select"  style="display: inline-block;width: 100%;">
-                    <option value="-" selected> --- Select Event --- </option>
-                    <option>game:match_created</option>
-                    <option>game:initialized</option>
-                    <option>game:pre_countdown_begin</option>
-                    <option>game:post_countdown_begin</option>
-                    <option>game:goal_scored</option>
-                    <option>game:replay_start</option>
-                    <option>game:replay_will_end</option>
-                    <option>game:replay_end</option>
-                    <option>game:match_ended</option>
-                    <option>game:podium_start</option>
-                    <option>game:replay_created</option>
-                    <option>mncs:match_ended</option>
-                </select>
-                <div class="uk-width-1-1">
-                    <input id="scene-hide-transition" style="display: inline-block;" class="uk-checkbox" onchange="!this.checked ? document.getElementById('scene-hide-transition-rate').setAttribute('disabled', '') : document.getElementById('scene-hide-transition-rate').removeAttribute('disabled')" type="checkbox" />
-                    <p style="display: inline-block;">Transition?</p>
-                    <input disabled id="scene-hide-transition-rate" class="uk-range" oninput="document.getElementById('hide-rate-display').innerText = this.value + 'x'" style="display: inline-block;max-width:300px;" type="range" value="1" min="0.25" max="4" step="0.25" />
-                    <p id="hide-rate-display" style="display: inline-block;">1.0x</p>
-                </div>
-                <div class="uk-width-1-1">
-                    <p style="display: inline-block;">Delay (ms) </p>
-                    <input id="scene-hide-delay" style="max-width:360px;margin-left:5px;" type="text" class="uk-input" style="display: inline-block" value="0" placeholder="Delay" />
+                <div class="uk-width-1-1"></div>
+                <p style="display: inline-block;margin-bottom:5px;">Add Hide Event? </p>
+                <input id="scene-hide-event-check" style="display: inline-block;" class="uk-checkbox" type="checkbox" onchange="!this.checked ? document.getElementById('scene-group-hide-event').setAttribute('hidden', '') : document.getElementById('scene-group-hide-event').removeAttribute('hidden')" />
+                <div hidden id="scene-group-hide-event">
+                    <select id="scene-hide-event" class="uk-select"  style="display: inline-block;width: 100%;">
+                        <option value="-" selected> --- Select Event --- </option>
+                        <option>game:match_created</option>
+                        <option>game:initialized</option>
+                        <option>game:pre_countdown_begin</option>
+                        <option>game:post_countdown_begin</option>
+                        <option>game:goal_scored</option>
+                        <option>game:replay_start</option>
+                        <option>game:replay_will_end</option>
+                        <option>game:replay_end</option>
+                        <option>game:match_ended</option>
+                        <option>game:podium_start</option>
+                        <option>game:replay_created</option>
+                        <option>mncs:match_ended</option>
+                    </select>
+                    <div class="uk-width-1-1">
+                        <input id="scene-hide-transition" style="display: inline-block;" class="uk-checkbox" onchange="!this.checked ? document.getElementById('scene-hide-transition-rate').setAttribute('disabled', '') : document.getElementById('scene-hide-transition-rate').removeAttribute('disabled')" type="checkbox" />
+                        <p style="display: inline-block;">Transition?</p>
+                        <input disabled id="scene-hide-transition-rate" class="uk-range" oninput="document.getElementById('hide-rate-display').innerText = this.value + 'x'" style="display: inline-block;max-width:300px;" type="range" value="1" min="0.25" max="4" step="0.25" />
+                        <p id="hide-rate-display" style="display: inline-block;">1.0x</p>
+                    </div>
+                    <div class="uk-width-1-1">
+                        <p style="display: inline-block;">Delay (ms) </p>
+                        <input id="scene-hide-delay" style="max-width:360px;margin-left:5px;" type="text" class="uk-input" style="display: inline-block" value="0" placeholder="Delay" />
+                    </div>
                 </div>
             </div>
             <div class="uk-width-1-1">
@@ -114,23 +121,30 @@
     function sceneUpdateScenesVisibilityChanged(show) {
         if(show) {
             // Update properties?
-
+            $("#scene-hide-show-div select").val("-");
+            $("#scene-hide-show-div input[type=checkbox]").prop("checked", false);
+            $("#scene-hide-show-div input[type=range]").val("1");
+            $("#scene-hide-show-div input[type=text]").val("");
+            $("#scene-group-hide-event").attr("hidden", "");
+            $("#scene-group-show-event").attr("hidden", "");
+            $("#show-rate-display").text("1.0x");
+            $("#hide-rate-display").text("1.0x");
             document.getElementById('scene-hide-show-div').removeAttribute('hidden'); 
         } else 
             document.getElementById('scene-hide-show-div').setAttribute('hidden', '');
     }
 
     function sceneUpdateSceneEvents() {
-        if(document.getElementById("update-scene-input").value !== '-' && document.getElementById("scene-show-event").value !== '-' && document.getElementById("scene-hide-event").value !== '-') {
+        if(document.getElementById("update-scene-input").value !== '-') {
             let data = {
                 show: {
-                    event: document.getElementById("scene-show-event").value,
+                    event: document.getElementById("scene-show-event-check").checked ? document.getElementById("scene-show-event").value : "-",
                     transition: document.getElementById("scene-show-transition").checked,
                     transition_rate: Number(document.getElementById("scene-show-transition-rate").value),
                     delay: Number(document.getElementById("scene-show-delay").value)
                 },
                 hide: {
-                    event: document.getElementById("scene-hide-event").value,
+                    event: document.getElementById("scene-hide-event-check").checked ? document.getElementById("scene-hide-event").value : "-",
                     transition: document.getElementById("scene-hide-transition").checked,
                     transition_rate: Number(document.getElementById("scene-hide-transition-rate").value),
                     delay: Number(document.getElementById("scene-hide-delay").value)
@@ -165,14 +179,13 @@
         document.getElementById("remove-scene-input").innerHTML = "<option value='-' selected> --- Select Scene --- </option>";
         document.getElementById("update-scene-input").innerHTML = "<option value='-' selected> --- Select Scene --- </option>";
         sCurScenes.forEach((entry) => {
-            console.log(entry);
             document.getElementById("remove-scene-input").innerHTML += "<option>"+entry+"</option>";
             document.getElementById("update-scene-input").innerHTML += "<option>"+entry+"</option>";
         });
     }
 
     ServerManager.addListener("status_changed", (data) => {
-        if(data["status"] === "CONNECTED") {
+        if(data["status"] === "INITIALIZED") {
             $.get("scenes", (data, status, xhr) => {
                 sCurScenes = data.scenes;
                 sceneUpdateSceneLists();

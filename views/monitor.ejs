@@ -8,6 +8,15 @@
         flex-flow: row wrap;
         margin-left: 40px;
     }
+    #monitor-container .panel {
+        background-color: #18181b;
+    }
+    #monitor-overlays > p, #monitor-scenes > p {
+        color: white;
+        margin-top:30px;
+        width: 100%;
+        text-align: center;
+    }
 </style>
 
 <p>Monitor</p>
@@ -24,12 +33,22 @@
     <!-- Fill in the rest of these with sumthin, like graphs n shiet, stats perhaps, but failure, yes failure as well -->
     <div class="panel panel-float panel-pad">
         <div>
-            
+            <!-- List of overlays and an option to deactivate -->
+            <p style="color: white;font-size:24px;width:100%;text-align: center;margin-top:10px;">Connected Overlays</p>
+
+            <div id="monitor-overlays">
+                <p>No overlays connected.</p>
+            </div>
         </div>
     </div>
     <div class="panel panel-float panel-pad">
         <div>
-            
+            <!-- List of scenes and transition buttons -->
+            <p style="color: white;font-size:24px;width:100%;text-align: center;margin-top:10px;">Scenes</p>
+
+            <div id="monitor-scenes">
+                <p>No scenes added.</p>
+            </div>
         </div>
     </div>
     <div class="panel panel-float panel-pad">
@@ -38,3 +57,107 @@
         </div>
     </div>
 </div>
+
+<script>
+    function monitorDisconnect(name) {
+        if(Relay.socket && Relay.socket.loggedIn)
+            Relay.socket.emit("deactivate", name);
+    }
+
+    function monitorUpdateOverlays() {
+        if(monitorClients.length === 0)
+            document.getElementById("monitor-overlays").innerHTML = "<p>No overlays connected.</p>";
+        else {
+            document.getElementById("monitor-overlays").innerHTML = "";
+            monitorClients.forEach((entry) => {
+                let html = `
+                    <div class="uk-width-1-1" style="display: flex;flex-direction: row;">
+                        <span uk-icon="icon: desktop" style="color: white;align-self: center;"></span>
+                        <p style="color:white;margin-left:15px;">${entry}</p>
+                        <button name="${entry}" style="align-self: center;margin-left: auto;" class="uk-button uk-button-danger" onclick="monitorDisconnect(this.getAttribute('name'))">Disconnect</button>
+                    </div>`;
+                document.getElementById("monitor-overlays").innerHTML += html;
+            });
+        }
+    }
+
+    function monitorSceneUpdate(type, scene) {
+        let rate = document.getElementById("monitor-transition-rate").value;
+        let transition = type.includes("transition") ? true : false;
+        let action = type.includes('show') ? 'show' : 'hide';
+
+        if(Relay.socket && Relay.socket.loggedIn) {
+            Relay.socket.emit(action + " scene", {
+                scene: scene,
+                delay: 0,
+                transition: transition,
+                transition_rate: rate
+            });
+        }
+    }
+
+    function monitorUpdateScenesView() {
+        
+        if(mCurScenes.length === 0)
+            document.getElementById("monitor-scenes").innerHTML = "<p>No scenes added.</p>";
+        else {
+            let html = `
+                <p style="display: inline-block;width: initial;margin-right:10px;margin-top:5px;">Transition Rate: </p>
+                <input id="monitor-transition-rate" class="uk-range" oninput="document.getElementById('monitor-rate-display').innerText = this.value + 'x'" style="display: inline-block;max-width:275px;" type="range" value="1" min="0.25" max="4" step="0.25" />
+                <p id="monitor-rate-display" style="display: inline-block;width:initial;margin-top:5px;">1.0x</p>
+            `;
+            mCurScenes.forEach((entry) => {
+                html += `
+                    <div class="uk-width-1-1" style="display: flex;flex-direction: row;margin-top:10px;">
+                        <span uk-icon="icon: video-camera" style="color: white;align-self: center;"></span>
+                        <p style="color:white;margin-left:15px;margin-top:0;margin-bottom:0;align-self:center;">${entry}</p>
+                        <button name="${entry}" style="margin-left: auto;align-self: center;padding: 0px 5px;" class="uk-button uk-button-primary" onclick="monitorSceneUpdate('show_transition', this.getAttribute('name'))">T - Show</button>
+                        <button name="${entry}" style="align-self: center;margin-left:5px;padding: 0px 5px;" class="uk-button uk-button-primary" onclick="monitorSceneUpdate('show', this.getAttribute('name'))">Show</button>
+                        <button name="${entry}" style="align-self: center;margin-left:5px;padding: 0px 5px;" class="uk-button uk-button-primary" onclick="monitorSceneUpdate('hide_transition', this.getAttribute('name'))">T - Hide</button>
+                        <button name="${entry}" style="align-self: center;margin-left:5px;padding: 0px 5px;" class="uk-button uk-button-primary" onclick="monitorSceneUpdate('hide', this.getAttribute('name'))">Hide</button>
+                    </div>`;
+            });
+            document.getElementById("monitor-scenes").innerHTML = html;
+        }
+    }
+    
+    let mCurScenes = [];
+    let monitorClients = [];
+
+    ServerManager.addListener("status_changed", (data) => {
+        if(data["status"] === "INITIALIZED") {
+
+            $.get("scenes", (data, status, xhr) => {
+                mCurScenes = data.scenes;
+                console.log(mCurScenes);
+                monitorUpdateScenesView();
+            });
+            Relay.socket.on("scene added", (name) => {
+                mCurScenes.push(name);
+                monitorUpdateScenesView();
+            });
+
+            Relay.socket.on("scene removed", (name) => {
+                mCurScenes = mCurScenes.filter(x => x !== name);
+                monitorUpdateScenesView();
+            });
+
+            Relay.socket.emit("get overlays", (overlays) => {
+                monitorClients = overlays;
+                monitorUpdateOverlays();
+            })
+
+            Relay.socket.on("overlay activated", (name) => {
+                sendNotification("Overlay activated! ["+name+"]");
+                monitorClients.push(name);
+                monitorUpdateOverlays();
+            });
+
+            Relay.socket.on("deactivate", (name) => {
+                sendNotification("Overlay deactivated. ["+name+"]");
+                monitorClients = monitorClients.filter(x => x !== name);
+                monitorUpdateOverlays();
+            });
+        }
+    })
+</script>
