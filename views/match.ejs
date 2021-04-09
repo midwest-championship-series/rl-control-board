@@ -199,9 +199,9 @@
                 }
             });
 
-            Relay.socket.on("game ended", (game) => {
-                document.getElementById("home-team-score-input").value = game.homeTeam.series;
-                document.getElementById("away-team-score-input").value = game.awayTeam.series;
+            Relay.socket.on("game ended", (match) => {
+                document.getElementById("home-team-score-input").value = match.game.homeTeam.series;
+                document.getElementById("away-team-score-input").value = match.game.awayTeam.series;
             });
         }
     });
