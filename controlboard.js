@@ -66,8 +66,9 @@ const Relay = {
         Relay.socketStatus = SocketStatus.CONNECTING;
         Relay.statusUpdate(SocketStatus.CONNECTING, server);
 
+        // Modify this to be the same as overlay!
         Relay.socket = io(server, {
-            reconnection: false,
+            reconnection: true,
             transports: ['websocket'], // long polling doesn't work due to cors or some shiet
             upgrade: false
         });
@@ -99,35 +100,6 @@ const Relay = {
                 Relay.socketStatus = SocketStatus.DISCONNECTED;
                 Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
                 ServerManager.connectedServer = undefined;
-            });
-
-            Relay.socket.on("game event", (data) => {
-                
-            });
-
-            Relay.socket.on("team removed", (name) => {
-
-            });
-
-            Relay.socket.on("team added", (team) => {
-
-            });
-
-            Relay.socket.on("team updated", (name, team) => {
-
-            });
-
-            Relay.socket.on("teams refreshed", (teams) => {
-
-            });
-
-            /*
-            data:
-                - teamnum
-                - team
-            */
-            Relay.socket.on("team set", (data) => {
-
             });
         });
 

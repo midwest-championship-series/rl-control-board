@@ -65,7 +65,7 @@ exports.processScene = (scene, res) => {
                             } else if (fileName === "overlay.html") {
                                 overlay = true;
                                 entry.pipe(fs.createWriteStream('./scenes/' + scene + '/overlay.html', { flags: 'w'}));
-                            } else if(mime.lookup(fileName) && mime.lookup(fileName).includes('image/')) {
+                            } else if(mime.lookup(fileName) && (mime.lookup(fileName).includes('image/') || mime.lookup(fileName).includes('video/') || mime.lookup(fileName).includes('font/'))) {
                                 entry.pipe(fs.createWriteStream('./public/overlay/img/' + scene + '/' + fileName.replace("img/", ""), { flags: 'w'}));
                             } else {
                                 entry.autodrain();

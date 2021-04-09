@@ -1,0 +1,24 @@
+<style>
+    #reconnecting {
+        background-color: rgb(255, 0, 0, .5);
+        opacity: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s linear; 
+    }
+</style>
+
+<rl-scene id="reconnecting" name="RECONNECTING" class="overlay">
+    <p class="montserrat" style="font-size: 48px;">Reconnecting...</p>
+</rl-scene>
+
+<script>
+    Relay.addListener("status_changed", (data) => {
+        if(data["status"] === "CONNECTED") {
+            document.getElementById('reconnecting').style.opacity = "0";
+        } else if(data["status"] !== "INITIALIZED") {
+            document.getElementById('reconnecting').style.opacity = "1";
+        }
+    });
+</script>

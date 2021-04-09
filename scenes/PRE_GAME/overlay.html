@@ -1,0 +1,240 @@
+<style>
+    #pregame-scene p {
+        padding: 0;
+        margin: 0;
+    }
+    #pregame-scene {
+        width:100%;
+        height:100%;
+        overflow: hidden;
+        background: linear-gradient(0deg, rgba(101,162,209,0) 0%, rgba(101,162,209,0) 21%, rgba(101,162,209,0) 76%, rgba(216,233,246,1) 100%);
+        z-index: 8;
+    }
+    #pregame-main {
+        transition: background 2s ease;
+        animation: 120s pregame-scroll infinite linear;
+        background: url("./img/PRE_GAME/hexagon.svg"), 
+            linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(80,84,87,0) 25%),
+            rgba(101, 162, 209, 1);
+    }
+    #pregame-blue-players, #pregame-orange-players {
+        margin-top: 30px;
+    }
+    
+    .pregame-blue-player {
+        height: 65px;
+        margin-bottom: 30px;
+        width: 550px;
+    }
+    .pregame-orange-player {
+        height: 65px;
+        margin-bottom: 30px;
+        width: 550px;
+    }
+    .pregame-player-name {
+        padding-left: 75px !important;
+        line-height: 65px;
+        height: 65px;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bolder;
+        font-size: 30px;
+        text-transform: uppercase;
+    }
+    .pregame-team-name {
+        font-size: 60px;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 50px;
+        font-weight: 600 !important;
+    }
+    .pregame-team-logo {
+        width: 400px;
+        height: 400px;
+        align-self: center;
+    }
+    #pregame-scene .col-xl {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 200px;
+    }
+    #pregame-scene .col-xl-2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    @keyframes pregame-scroll {
+        100% {background-position: 5000px 0px;}
+    }
+    #pregame-scene svg { 
+        background: rgba(0, 0, 0, 0);
+        z-index:9;
+        opacity: 1;
+        margin: -10 -10;
+    }
+    #pregame-scene polygon { 
+        fill: rgba(0, 0, 0, 0); 
+        stroke-width: 0.4;
+        stroke: rgb(0, 0, 0);
+    }
+</style>
+
+<rl-scene hidden id="pregame-scene" name="PRE_GAME">
+    <div id="pregame-predictions" class="container" style="max-width:100% !important;position:absolute;top:0;left:0; z-index:10;margin-top:370px;padding-right:45px;display: flex;flex-direction:column;align-self:center;align-content:center;justify-content:center;width:100%;height:100%;opacity:0;">
+        <div style="align-self:center;background-color: black;width:250px;height:30px;padding-left:17px;padding-top:5px;border-top-right-radius: 10px;margin-bottom:10px;border-top-left-radius: 10px;">
+            <p class="montserrat" style="color: white;">
+                Who will win?  Vote in chat!
+            </p>
+        </div>
+        <svg height="90" width="700" style="align-self: center;">
+            <defs>
+                <linearGradient  id="pregame-grad1" gradientTransform="rotate(1.8)">
+                    <stop offset="0%" style="stop-color:rgb(255, 50, 50);stop-opacity:1;" />
+                    <stop offset="49%" style="stop-color:rgb(255, 50, 50);stop-opacity:1;transition: offset 2s linear;" id="pregame-btgrad" />
+                    <stop offset="50%" style="stop-color:rgb(0,0,0);stop-opacity:1;transition: offset 2s linear;" id="pregame-center" />
+                    <stop offset="50.1%" style="stop-color:rgb(255, 50, 50);stop-opacity:1;transition: offset 2s linear;" id="pregame-otgrad" />
+                    <stop offset="100%" style="stop-color:rgb(255, 50, 50);stop-opacity:1" />
+                </linearGradient >
+            </defs>
+            <polygon points="0,90 30,0 700,0 675,90" style="fill:url(#pregame-grad1);stroke-width:3" />
+            <text id="pregame-bHashtag" x="50" y="60" fill="black" style="font-size:50px;">#ERROR</text>
+            <text id="pregame-oHashtag" x="490" y="60" fill="black" style="font-size:50px;">#ERROR</text>
+        </svg>
+    </div>
+    <div id="pregame-main" class="container" style="display: block;max-width:100% !important;">
+        <!-- TODO: Team Divs containing rosters, avg mmr? -->
+        <div class="row" style="width:100%;height:100%;z-index:4">
+            <div class="col-xl" style="z-index:4;">
+                <img id="pregame-blue-team-logo" class="pregame-team-logo" src="./img/PRE_GAME/error.png"/>
+                <p id="pregame-blue-team-name" class="pregame-team-name montserrat-bold"></p>
+                <div id="pregame-blue-players">
+                    
+                </div>
+            </div>
+            <div class="col-xl-2" style="z-index:2;display:flex;align-items:center;align-self:center;justify-content: center;">
+                <p class="montserrat-bold" style="align-self: center;font-size: 130px;">vs</p>
+            </div>
+            <div class="col-xl" style="z-index:4;">
+                <img id="pregame-orange-team-logo" class="pregame-team-logo" src="./img/PRE_GAME/error.png"/>
+                <p id="pregame-orange-team-name" class="pregame-team-name montserrat-bold"></p>
+                <div id="pregame-orange-players">
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</rl-scene>
+
+<script>
+    const PREGAME_PredictionState = {
+        STOPPED: 'stopped', // Don't display predictions
+        STARTING: 'starting', // Display hashtags only, set background to light gray maybe?
+        STARTED: 'started' // Display both hashtags and vote counts, set background to whoever is winning (or light gray if tied)
+    };
+
+    let pregame_homePrimary = "#0099ff";
+    let pregame_homeSecondary = "#ffffff";
+    let pregame_awayPrimary = "#ff9900";
+    let pregame_awaySecondary  = "#ffffff";
+    let pregame_pState = PREGAME_PredictionState.STOPPED;
+
+    function pregameStartPrediction(bHashtag, oHashtag){
+        // Set hashtag values then transition it in
+        document.getElementById("pregame-bHashtag").textContent = "#" + bHashtag;
+        document.getElementById("pregame-oHashtag").textContent = "#" + oHashtag
+        animateCSS("#pregame-predictions", "fadein");
+        pState = PREGAME_PredictionState.STARTING;
+        document.getElementById('pregame-predictions').style.opacity = "1";
+        pregameSetBackgroundColor("gray");
+    }
+    
+    function pregameStopPrediction() {
+        animateCSS("#pregame-predictions", "fadeOut");
+        document.getElementById("pregame-predictions").style.opacity = "0";
+
+        pregameSetBackgroundColor("rgba(101,162,209,1)");
+    }
+
+    function pregameSetBackgroundColor(color) {
+        console.log("setting color to " + color);
+        document.getElementById("pregame-main").style.background = 'url("./img/PRE_GAME/hexagon.svg"), linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(80,84,87,0) 25%), ' +color;
+    }
+
+    Relay.addListener("status_changed", (data) => {
+        if(data["status"] === "INITIALIZED") {
+
+            Relay.socket.on("prediction started", (bHashtag, oHashtag) => {
+                var percentHome = 50;
+                var html = '<stop offset="0%" style="stop-color:'+pregame_homePrimary+';stop-opacity:1;" /><stop offset="'+(percentHome - 1)+'%" style="stop-color:'+pregame_homePrimary+';stop-opacity:1;transition: offset 2s;" id="btgrad" /><stop offset="'+percentHome+'%" style="stop-color:rgb(0,0,0);stop-opacity:1" /><stop offset="'+(percentHome+0.1)+'%" style="stop-color:'+pregame_awayPrimary+';stop-opacity:1;transition: offset 2s;" id="otgrad" /><stop offset="100%" style="stop-color:'+pregame_awayPrimary+';stop-opacity:1" />';
+                document.getElementById('pregame-grad1').innerHTML = html;
+                document.getElementById('pregame-bHashtag').setAttribute('fill', pregame_homeSecondary);
+                document.getElementById('pregame-oHashtag').setAttribute('fill', pregame_awaySecondary);
+                pregameStartPrediction(bHashtag, oHashtag);
+            });
+
+            Relay.socket.on("prediction stopped", () => {
+                pregameStopPrediction();
+            });
+
+            Relay.socket.on("prediction update", (homeVotes, awayVotes) => {
+                var total = homeVotes + awayVotes;
+                var percentHome = 50;
+                if(total > 0){
+                    percentHome = homeVotes / total * 100;
+                }
+
+                document.getElementById('pregame-bHashtag').setAttribute('fill', pregame_homeSecondary);
+                document.getElementById('pregame-oHashtag').setAttribute('fill', pregame_awaySecondary);
+                var html = '<stop offset="0%" style="stop-color:'+pregame_homePrimary+';stop-opacity:1;" /><stop offset="'+(percentHome - 1)+'%" style="stop-color:'+pregame_homePrimary+';stop-opacity:1;transition: offset 2s;" id="btgrad" /><stop offset="'+percentHome+'%" style="stop-color:rgb(0,0,0);stop-opacity:1" /><stop offset="'+(percentHome+0.1)+'%" style="stop-color:'+pregame_awayPrimary+';stop-opacity:1;transition: offset 2s;" id="otgrad" /><stop offset="100%" style="stop-color:'+pregame_awayPrimary+';stop-opacity:1" />';
+                document.getElementById('pregame-grad1').innerHTML = html;
+
+                // Transition if it wasn't already STARTED
+                pregame_pState = PREGAME_PredictionState.STARTED;
+
+                // Update votes, then change the background color accordingly
+                if(homeVotes > awayVotes) { 
+                    pregameSetBackgroundColor(pregame_homePrimary);
+                } else if(homeVotes < awayVotes) { 
+                    pregameSetBackgroundColor(pregame_awayPrimary);
+                } else {
+                    pregameSetBackgroundColor("gray");
+                }
+            });
+
+            Relay.socket.on("update state", (match) => {
+
+                if(!(match["game"] && match["game"]["homeTeam"] && match["game"]["awayTeam"] && match["game"]["homeTeam"]["avatar"] && match["game"]["awayTeam"]["avatar"]))
+                    return;
+
+                document.getElementById("pregame-blue-team-logo").src = match["game"]["homeTeam"]["avatar"];
+                document.getElementById("pregame-orange-team-logo").src = match["game"]["awayTeam"]["avatar"];
+                document.getElementById("pregame-blue-team-name").innerText = match["game"]["homeTeam"]["name"];
+                document.getElementById("pregame-orange-team-name").innerText = match["game"]["awayTeam"]["name"];
+
+                document.getElementById("pregame-blue-players").innerHTML = "";
+                document.getElementById("pregame-orange-players").innerHTML = "";
+
+                var blueNum = 1;
+                var orangeNum = 1;
+                match['game']['homeTeam']['players'].forEach(function(entry) {
+                    if(blueNum <= match['teamSize']){
+                        document.getElementById("pregame-blue-players").innerHTML += '<div class="pregame-blue-player" style="color:'+match["game"]["homeTeam"]["colors"]["homePrimary"]+';background:linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 7%, '+match["game"]["homeTeam"]["colors"]["homePrimary"]+' 8%, '+match["game"]["homeTeam"]["colors"]["homePrimary"]+' 11%, '+match["game"]["homeTeam"]["colors"]["homeSecondary"]+'88 12%, '+match["game"]["homeTeam"]["colors"]["homeSecondary"]+'88 94%, rgba(251,0,0,0) 95%);"><p class="pregame-player-name">'+entry.name+'</p></div>';
+                        blueNum++;
+                    }
+                });
+                match['game']['awayTeam']['players'].forEach(function(entry) {
+                    if(orangeNum <= match['teamSize']){
+                        document.getElementById("pregame-orange-players").innerHTML += '<div class="pregame-orange-player" style="color: '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+';background:linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 7%, '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+' 8%, '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+' 11%, '+match["game"]["awayTeam"]["colors"]["awaySecondary"]+'88 12%, '+match["game"]["awayTeam"]["colors"]["awaySecondary"]+'88 94%, rgba(251,0,0,0) 95%);"><p class="pregame-player-name">'+entry.name+'</p></div>';
+                        orangeNum++;
+                    }
+                });
+
+                pregame_homePrimary = match["game"]["homeTeam"]["colors"]["homePrimary"];
+                pregame_homeSecondary = match["game"]["homeTeam"]["colors"]["homeSecondary"];
+                pregame_awayPrimary = match["game"]["awayTeam"]["colors"]["awayPrimary"];
+                pregame_awaySecondary = match["game"]["awayTeam"]["colors"]["awaySecondary"];
+            });
+        }
+    });
+</script>

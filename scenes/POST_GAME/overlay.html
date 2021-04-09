@@ -1,0 +1,313 @@
+<style>
+#postgame-scene p {
+    padding: 0;
+    margin: 0;
+}
+#postgame-scene {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden;
+    z-index: 8;
+}
+@keyframes postgame-logo {
+    0% { margin-top: 2%; }
+    50% { margin-top: -2%; }
+    100% { margin-top: 2%; }
+}
+#postgame-main {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    z-index: 1;
+    transition: background 2s ease;
+    animation: 120s postgame-scroll infinite linear;
+    background: url("./img/POST_GAME/hexagon.svg"), 
+        linear-gradient(0deg, rgb(0, 0, 0) 0%, rgb(48, 98, 136) 20%, rgb(2 75 132 / 62%) 50%, rgb(10 131 224 / 40%) 90%, rgb(148, 209, 255, 0.6) 100%, #ffffff 100%)
+}
+@keyframes postgame-scroll {
+    100% {background-position: 5000px 0px;}
+}
+#postgame-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    z-index: -1;
+}
+.postgame-team-logo {
+    max-width: 205px;
+    max-height: 205px;
+    align-self: center;
+}
+#postgame-mncs {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    opacity: .2;
+    transform: translate(-50%, -50%);
+    animation: postgame-logo 5s infinite ease-in-out;
+}
+#postgame-scene .col-md-auto {
+    padding: 0 !important;
+}
+.postgame-series-score-active {
+    background-color: yellow;
+    min-height: 8px;
+    margin-left: 8px;
+    margin-right: 8px; 
+    width: 50px !important;
+    box-shadow: 0 0 5px 2px yellow;
+}
+.postgame-series-score-inactive {
+    background-color: rgb(126, 98, 6);
+    min-height: 8px;
+    margin-left: 8px;
+    margin-right: 8px; 
+    width: 50px !important;
+    box-shadow: 0px 0px 15px rgb(212, 163, 3) inset;
+}
+.postgame-player {
+    height: 65px;
+}
+.postgame-player-name {
+    padding-left: 75px !important;
+    padding-top: 7px !important;
+    line-height: 65px;
+    height: 65px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bolder;
+    font-size: 30px !important;
+    text-transform: uppercase;
+    color: white;
+    
+}
+#postgame-scene .col > p {
+    color: white;
+    font-size: 40px;
+    font-family: 'Montserrat', sans-serif;
+}
+.postgame-player-row {
+    margin-bottom: 20px;
+}
+</style>
+
+<rl-scene hidden id="postgame-scene" name="POST_GAME">
+    <p id="postgame-match-point" class="montserrat" style="font-size: 80px;position: absolute; left:50%; transform: translate(-50%, -50%);top:300px;z-index: 10;text-shadow: 2px 2px 6px #000;display:none;">MATCH POINT</p>
+
+    <div id="postgame-main" class="container" style="display: block;">
+        <!-- TODO: Team Divs containing series score, game score, and player rows -->
+        <div class="row" style="width:100%; height:100%;">
+            <div class="col" style="display: flex; flex-direction: column;justify-content: center;align-items: center;">
+                <!-- winning team -->
+                <p class="montserrat" id="postgame-wteam-name" style="font-size: 50px;color: black;text-shadow: 1px 1px 5px #000;"></p>
+                
+                <div class="row" id="postgame-wteam-series" style="margin-top:5px;margin-bottom: 40px;">
+                    <!-- Auto populate -->
+                </div>
+
+                <div id="postgame-wteam-players">
+                    <!-- Auto populate -->
+                </div>
+
+            </div>
+            <div class="col-md-auto" style="display: flex; flex-direction: row; justify-content: center; align-items: center;">
+                <img id="postgame-wteam-logo" class="postgame-team-logo" src="./img/POST_GAME/error.png" style="filter: drop-shadow(0 0 1.25rem yellow);" />
+                <p id="postgame-game-score" class="montserrat-bold" style="padding-left:30px;padding-right:30px;font-size: 90px;"></p>
+                <img id="postgame-lteam-logo" class="postgame-team-logo" src="./img/POST_GAME/error.png" style="filter: drop-shadow(0 0 1.25rem red);" />
+            </div>
+            <div class="col" style="display: flex; flex-direction: column;justify-content: center;align-items: center;">
+                <!-- losing team -->
+                <p id='postgame-lteam-name' class="montserrat" style="font-size: 50px;color: black;text-shadow: 1px 1px 5px #000;"></p>
+                
+                <div class="row" id="postgame-lteam-series" style="margin-top:5px;margin-bottom: 40px;">
+                    <!-- Auto populate -->
+                </div>
+
+                <div id="postgame-lteam-players">
+                    <!-- Auto populate -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <img src="./img/POST_GAME/mncs.png" id="postgame-mncs" />
+</rl-scene>
+
+<script>
+    function getPlayerHTML(player_name, team_color, goals, assists, saves, shots) {
+        var html = '<div class="row postgame-player-row" style="width: 600px;">';
+                html += '<div class="col postgame-player" style="">';
+                    html += '<p class="postgame-player-name" style="background: linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 5.4%, '+team_color+' 5.4%, '+team_color+' 9%, rgba(30,30,30,0.5) 9%, rgba(30,30,30,0.5) 96.7%, rgba(0,0,0,0) 96.7%, rgba(0,0,0,0) 100%);">'+player_name+'</p>';
+                html += '</div>';
+                html += '<div class="w-100"></div>';
+                html += '<div class="col" style="display: flex; flex-direction: row; justify-content: center; align-items: center; background: linear-gradient(90deg, '+team_color+' 0%, '+team_color+' 4%, rgba(30,30,30,0.5) 4%, rgba(30,30,30,0.5) 100%);height:75px;margin-left:23px;margin-right:35px;">';
+                    html += '<p style="margin-left:40px;">'+goals+'</p>';
+                    html += '<img src="./img/POST_GAME/goal.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+assists+'</p>';
+                    html += '<img src="./img/POST_GAME/assist.png" style="max-width:60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+saves+'</p>';
+                    html += '<img src="./img/POST_GAME/save.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />';
+                    html += '<p>'+shots+'</p>';
+                    html += '<img src="./img/POST_GAME/shot.png" style="max-width: 60px;margin-right:20px;margin-left:5px;" />';
+                html += '</div>';
+            html += '</div>';
+            return html;
+    }
+
+    function processGameEnded(match) {
+        let postgame_wteam = {};
+        let postgame_lteam = {};
+        let game = match["game"];
+        if(game["homeTeam"]["name"] === game["winner"]) {
+            postgame_wteam = game["homeTeam"];
+            postgame_lteam = game["awayTeam"];
+        } else {
+            postgame_lteam = game["homeTeam"];
+            postgame_wteam = game["awayTeam"];
+        }
+
+        document.getElementById("postgame-wteam-name").innerText = postgame_wteam["name"];
+        document.getElementById("postgame-lteam-name").innerText = postgame_lteam["name"];
+
+        document.getElementById("postgame-wteam-logo").src = postgame_wteam["avatar"];
+        document.getElementById("postgame-lteam-logo").src = postgame_lteam["avatar"];
+
+        document.getElementById("postgame-wteam-series").innerHTML = "";
+        document.getElementById("postgame-lteam-series").innerHTML = "";
+        
+        let stw = Math.ceil(match["bestOf"] / 2);
+        for(var i = 1; i <= stw; i++){
+            if(postgame_wteam["series"] >= i) {
+                document.getElementById('postgame-wteam-series').innerHTML += '<div class="col postgame-series-score-active"></div>';
+            } else {
+                document.getElementById('postgame-wteam-series').innerHTML += '<div class="col postgame-series-score-inactive"></div>';
+            }
+            if(postgame_lteam["series"] >= i) {
+                document.getElementById('postgame-lteam-series').innerHTML += '<div class="col postgame-series-score-active"></div>';
+            } else {
+                document.getElementById('postgame-lteam-series').innerHTML += '<div class="col postgame-series-score-inactive"></div>';
+            }
+        }
+
+        document.getElementById('postgame-match-point').style.display = "none";
+        if(stw - 1 === postgame_wteam["series"]) {
+            document.getElementById('postgame-match-point').style.display = "block";
+        }
+        if(stw - 1 === postgame_lteam["series"]) {
+            document.getElementById('postgame-match-point').style.display = "block";
+        }
+
+        document.getElementById("postgame-game-score").innerText = postgame_wteam['score'] + " - " + postgame_lteam['score'];
+
+        let wteamColor = postgame_wteam["colors"]["homePrimary"];
+        let lteamColor = postgame_lteam["colors"]["awayPrimary"];
+        document.getElementById('postgame-wteam-players').innerHTML = "";
+        document.getElementById('postgame-lteam-players').innerHTML = "";
+        Object.values(postgame_wteam["players"]).forEach((player, index) => {
+            if(index < match["teamSize"])
+                document.getElementById('postgame-wteam-players').innerHTML += getPlayerHTML(player['name'], wteamColor, player['goals'], player['assists'], player['saves'], player['shots']);
+        });
+        Object.values(postgame_lteam["players"]).forEach((player, index) => {
+            if(index < match["teamSize"])
+                document.getElementById('postgame-lteam-players').innerHTML += getPlayerHTML(player['name'], lteamColor, player['goals'], player['assists'], player['saves'], player['shots']);
+        });
+    }
+
+
+    $(() => {
+        Relay.addListener("status_changed", (data) => {
+            if(data["status"] === "INITIALIZED") {
+                Relay.socket.on("game ended", (match) => {
+                    processGameEnded(match);
+                });
+            }
+        });
+
+        /* Just for testing
+        setTimeout(() => {
+            let match = {
+                game: {
+                    homeTeam: {
+                        name: "Test Team #1",
+                        avatar: "https://cdn.discordapp.com/attachments/692994579305332806/744660376507121794/mncs_stpaulsenators.png",
+                        players: [ 
+                            {
+                                name: "chez",
+                                goals: 5,
+                                assists: 0,
+                                saves: 3,
+                                shots: 7
+                            },
+                            {
+                                name: "test player",
+                                goals: 0,
+                                assists: 3,
+                                saves: 5,
+                                shots: 3
+                            },
+                            {
+                                name: "pacey",
+                                goals: 0,
+                                assists: 1,
+                                saves: 9,
+                                shots: 4
+                            }
+                        ],
+                        colors: {
+                            homePrimary: "#ff9900",
+                            homeSecondary: "#ffffff",
+                            awayPrimary: "#0099ff",
+                            awaySecondary: "#ffffff"
+                        },
+                        score: 5,
+                        series: 2
+                    },
+                    awayTeam: {
+                        name: "Test Team #2",
+                        avatar: "https://cdn.discordapp.com/attachments/692994579305332806/744660329195241522/mncs_burnsvilleinferno.png",
+                        players: [ 
+                            {
+                                name: "tero",
+                                goals: 2,
+                                assists: 0,
+                                saves: 5,
+                                shots: 1
+                            },
+                            {
+                                name: "team 2 test",
+                                goals: 1,
+                                assists: 2,
+                                saves: 5,
+                                shots: 3
+                            },
+                            {
+                                name: "jives",
+                                goals: 0,
+                                assists: 0,
+                                saves: 5,
+                                shots: 7
+                            }
+                        ],
+                        colors: {
+                            homePrimary: "#ff9900",
+                            homeSecondary: "#ffffff",
+                            awayPrimary: "#0099ff",
+                            awaySecondary: "#ffffff"
+                        },
+                        score: 2,
+                        series: 3
+                    },
+                    winner: "Test Team #1"
+                },
+                bestOf: 7,
+                teamSize: 1
+            };
+            processGameEnded(match);
+        }, 3000);*/
+    });
+</script>
