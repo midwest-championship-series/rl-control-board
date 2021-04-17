@@ -159,17 +159,20 @@
             return html;
     }
 
-    function processGameEnded(match) {
+    function processGameEnded(match, teamnum) {
         let postgame_wteam = {};
         let postgame_lteam = {};
         let game = match["game"];
-        if(game["homeTeam"]["name"] === game["winner"]) {
+        if(teamnum === 0) {
             postgame_wteam = game["homeTeam"];
             postgame_lteam = game["awayTeam"];
         } else {
             postgame_lteam = game["homeTeam"];
             postgame_wteam = game["awayTeam"];
         }
+        console.log(game["winner"]);
+        console.log(postgame_wteam);
+        console.log(postgame_lteam);
 
         document.getElementById("postgame-wteam-name").innerText = postgame_wteam["name"];
         document.getElementById("postgame-lteam-name").innerText = postgame_lteam["name"];
@@ -222,13 +225,13 @@
     $(() => {
         Relay.addListener("status_changed", (data) => {
             if(data["status"] === "INITIALIZED") {
-                Relay.socket.on("game ended", (match) => {
-                    processGameEnded(match);
+                Relay.socket.on("game ended", (match, teamnum) => {
+                    processGameEnded(match, teamnum);
                 });
             }
         });
 
-        /* Just for testing
+        /* Just for testing*/
         setTimeout(() => {
             let match = {
                 game: {
@@ -307,7 +310,7 @@
                 bestOf: 7,
                 teamSize: 1
             };
-            processGameEnded(match);
-        }, 3000);*/
+            processGameEnded(match, 0);
+        }, 3000);
     });
 </script>

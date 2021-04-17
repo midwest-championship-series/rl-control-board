@@ -4,15 +4,26 @@
     }
     .team-logo {
         display: inline-block;
-        max-width: 60px;
+        max-width: 90px;
+        align-self: center;
     }
     .team-name {
         display: inline-block;
+        align-self: center;
+        margin-top: 0;
+        margin-bottom: 10px;
     }
-    #teams-list li {
+    #teams-list {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 100px;
+    }
+    #teams-list > li {
+        display: flex;
+        flex-direction: column;
+        width: 215px;
     }
     #teams-list button {
         align-self: center;
@@ -30,7 +41,10 @@
         <button style="margin-left: 15px;display: inline-block;font-size:15px;text-transform:none;" class="uk-button uk-button-text" uk-toggle="target: #add-team-modal">+ Add New Team</button>
     </div>
     <button style="margin-top:5px;" class="uk-button uk-button-primary uk-button-small" onclick="setRefreshTeams()">Refresh</button>
-    <ul class="uk-list uk-list-striped" id="teams-list" style="max-width: 500px;border: solid 2px #09f;"></ul>
+    <!--<ul class="uk-list uk-list-striped" id="teams-list" style="max-width: 500px;border: solid 2px #09f;"></ul>-->
+
+    <div id="teams-list">
+    </div>
 </div>
 <%- include('./modals/add_team.ejs'); %>
 
@@ -41,7 +55,7 @@ function setUpdateTeamsList(teams) {
     document.getElementById("teams-list").innerHTML = "";
     teams.forEach((entry) => {
         let uid = generateUUID();
-        let teamHtml = '<li id="'+uid+'"><img class="team-logo" src="'+entry.avatar+'" /><p class="team-name">' + entry.name + (entry.isOfficial ? " (API)" : "") + '</p><button class="uk-button uk-button-danger" '+(entry.isOfficial ? 'style="background-color: #f0506344 !important;cursor: default !important;" disabled' : 'onclick="Relay.socket.emit(\'remove team\', \''+entry.name+'\', (err, reply) => {})')+'">Remove</button></li>';
+        let teamHtml = '<li id="'+uid+'"><img class="team-logo" src="'+entry.avatar+'" /><p class="team-name">' + entry.name + '</p>'+(entry.isOfficial ? '' : '<button class="uk-button uk-button-danger" onclick="Relay.socket.emit(\'remove team\', \''+entry.name+'\', (err, reply) => {})">Remove</button>')+'</li>';
         document.getElementById("teams-list").innerHTML += teamHtml;
     });
 }

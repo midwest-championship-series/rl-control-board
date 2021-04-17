@@ -9,7 +9,8 @@
     "build:docker": "docker build -t mncscontrolboard:dev -f ./Dockerfile .",
     "start": "node index.js",
     "start:dev": "yarn build && nodemon index.js",
-    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev"
+    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev",
+    "start:docker:win": "docker stop mncs-controlboard-dev & docker rm mncs-controlboard-dev & docker rmi mncscontrolboard:dev & yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev"
   },
   "keywords": [],
   "author": "",

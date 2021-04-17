@@ -12,48 +12,118 @@
             p { 
                 font-family: 'Fira Sans', sans-serif; 
             }
-            video {
-                position: absolute;
-                z-index: -1;
-                top: 0px;
-                left: 0px;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
             .uk-input {
                 border: 1px solid #000; 
             }
             .uk-form-icon {
                 color: #444;
             }
+            html {
+                width: 100%;
+                height: 100%;
+                background-color: rgb(31, 27, 27);
+            }
+            #logos img {
+                width: 600px;
+                height: 600px;
+                position: absolute;
+                right: 100px;
+                top: 50%;
+                transform: translate(0px, -50%);
+                z-index:11;
+            }
+            #logos svg {
+                position: absolute;
+                right: 100px;
+                top: 50%;
+                transform: translate(0px, -50%);
+            }
+            #logo-path {
+                transition: opacity 2s;
+            }
+            #logo {
+                transition: opacity 1s;
+            }
+            #login-div {
+                background-color: #ddd;
+                border: 5px black solid;
+                box-shadow: 0px 0px 15px 4px rgb(108,172,220);
+                width: 400px;
+                height: 200px;
+                position: absolute;
+                left: 100px;
+                top: 50%;
+                transform: translate(0px, -50%);
+                overflow: hidden;
+            }
+            .uk-input {
+                border: 1px solid #000; 
+            }
+            #loading {
+                z-index:3;
+                position:absolute;
+                left:0px;
+                top:50%;
+                width:490px;
+                transition: opacity 0.3s;
+                transform:translate(0px,-50%);
+                height:200px;
+            }
+            .top {
+                z-index: 11;
+            }
+            #back-svg {
+                transition: opacity 2s;
+                width:100%;
+                height:100%;
+                z-index: 1;
+                padding-left:50%;
+                opacity: 0;
+                background-color: rgb(31, 27, 27);
+                background-image: url("./img/background.svg");
+                background-position:right;
+                background-repeat:no-repeat;
+                background-size:cover;
+            }
         </style>
+        <script>
+            <%- include('../node_modules/socket.io-client/dist/socket.io.min.js'); %>
+        </script>
     </head>
-    <body>
-        <!-- Login Form Page -->
-        <div class="uk-container uk-position-center uk-align-center" id="login-div" style="padding-top:30px;box-shadow: 4px 4px 15px 3px #000;background-color:#FFF;border-radius:15px;">
-            <form id="login-form">
-                <div class="uk-margin">
-                    <p style="font-size: 25px;text-align:center;">Control Board Login</p>
-                </div>
-                <div class="uk-margin uk-animation-fade" id="invalid-token" style="display: none;">
-                    <p style="color: #f00;text-align:center;font-weight:300;">Token Invalid.</p>
-                </div>
-                <div class="uk-margin">
-                    <div class="uk-inline">
-                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                        <input class="uk-input" type="text" placeholder="Token" id="login-token" required />
+    <body style="height:100%;overflow:hidden;">
+        <p hidden style="color:white;">The control board can only be used on a desktop.</p>
+
+        <div class="top uk-container" id="login-div">
+            <div id="loading" style="background-color:rgba(85, 85, 85, 0.596);opacity:0;display:none;">
+                <span style="margin-left:200px;margin-top:50px;color:white;" uk-spinner="ratio: 3"></span>
+            </div>
+            <div id="login-content">
+                <div id="server-entry" style="background-color:#ccc;display:flex;flex-direction: column;justify-content: center;align-items: center;">
+                    <h3 style="margin-bottom:10px;">Minnesota Championship Series</h3>
+                    <p id="server-error" style="color: red;width:100%;text-align:center;margin: 0;display: none;margin-bottom: 10px;">Server not available.</p>
+                    <div style="width:400px;height:initial;">
+                        <input class="uk-input uk-form-width-medium" style="border-top-left-radius: 10px;border-bottom-left-radius:10px;width:70px;margin-right:-5px;color:#fff;background-color:#aaa;border-color:black;padding:0;text-align:center;" type="text" placeholder="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" value="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" id="server-protocol" disabled />
+                        <input id="server" class="uk-input uk-form-width-medium" style="width:330px;" type="text" placeholder="Relay Server" />
                     </div>
+                    <button class="uk-button uk-button-primary" style="width: 90px;margin-left:auto;padding: 0;margin-right: 46px;margin-top: 10px;" onclick="validateServer()">Next ></button>
                 </div>
-                <div class="uk-margin">
-                    <input class="uk-input" type="submit" value="Login" />
+                <div id="token-entry" style="background-color:#aaa;display:flex;flex-direction: column;justify-content: center;align-items: center;">
+                    <h3 style="margin-bottom:10px;">Login Token</h3>
+                    <p id="token-error" style="color: red;width:100%;text-align:center;margin: 0;display: none;margin-bottom: 10px;">Token invalid.</p>
+                    <div style="width:400px;height:initial;">
+                        <input class="uk-input uk-form-width-medium" style="width:400px;" id="token" type="text" placeholder="Token" />
+                    </div>
+                    <button class="uk-button uk-button-primary" style="width: 90px;margin-left:auto;padding: 0;margin-right: 46px;margin-top: 10px;" onclick="validateToken()">Login</button>
                 </div>
-            </form>
+            </div>
+
         </div>
 
-        <video autoplay muted loop width="100%" height="100%">
-            <source src="./img/loginscreen.webm" type="video/webm" />
-        </video>
+        <div class="top" id="logos">
+            <img id="path" src="./img/mncs.svg" width="600" height="600" class="uk-animation-stroke" style="opacity: 1;" uk-svg="stroke-animation: true"> </img>
+            <img id="logo" src="./img/mncs.png" style="opacity: 0;" />
+        </div>
+        <div id="back-svg"></div>
 
         <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.15/dist/js/uikit.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.15/dist/js/uikit-icons.min.js"></script>
@@ -64,27 +134,142 @@
                     evt.preventDefault();
                     var token = document.getElementById("login-token").value;
 
-                    $.post(window.location.origin + "/login", { token: token }).done(function(data) {
-                        // If the token authenticates correctly, the server will respond with 200 OK saying successful. 
-                        // If it says successful, set the cookie to the token we just validated then refresh
-                        if(data === "successful") {
+            function showError(msg, type) {
+                if(type === "SERVER") {
+                    document.getElementById("server-error").innerText = msg;
+                    if(document.getElementById("server-error").style.display === "none") {
+                        document.getElementById("server-error").style.display = "block";
+                    } else {
+                        var $animate = $("#server-error");
+                        $animate.addClass("uk-animation-shake");
+                        $animate.one("webkitAnimationEnd oanimationend msAnimationEnd animationend",   
+                        function() {
+                            $animate.removeClass("uk-animation-shake");
+                            $animate.removeClass("uk-animation-fade");
+                        });
+                    }
+                } else if(type === "TOKEN"){
+                    document.getElementById("token-error").innerText = msg;
+                    if(document.getElementById("token-error").style.display === "none") {
+                        document.getElementById("token-error").style.display = "block";
+                    } else {
+                        var $animate = $("#token-error");
+                        $animate.addClass("uk-animation-shake");
+                        $animate.one("webkitAnimationEnd oanimationend msAnimationEnd animationend",   
+                        function() {
+                            $animate.removeClass("uk-animation-shake");
+                            $animate.removeClass("uk-animation-fade");
+                        });
+                    }
+                }
+            }
+
+            let socket = undefined;
+            let server = undefined;
+            let page = 1;
+
+            function validateServer() {
+                document.getElementById("server").blur();
+                document.getElementById("loading").style.display = "block";
+                document.getElementById("loading").style.opacity = "1";
+                server = document.getElementById("server-protocol").value + document.getElementById("server").value;
+                socket = io(server, {
+                    reconnection: false,
+                    timeout: 3000,
+                    transports: ['websocket'],
+                    upgrade: false
+                });
+                socket.on("connect", () => {
+                    setTimeout(() => {
+                        document.getElementById("loading").style.display = "none";
+                        document.getElementById("token").focus();
+                    }, 400);
+                    document.getElementById("loading").style.opacity = "0";
+                    document.getElementById("login-content").style.transform = "translate(-490px,0px)";
+                    page++;
+                });
+                socket.on("connect_error", () => {
+                    setTimeout(() => {
+                        document.getElementById("loading").style.display = "none";
+                    }, 300);
+                    document.getElementById("loading").style.opacity = "0";
+                    document.getElementById("server").focus();
+                    showError("Server not available.", "SERVER");
+                });
+            }
+
+            function validateToken() {
+                document.getElementById("token").blur();
+                document.getElementById("loading").style.display = "block";
+                document.getElementById("loading").style.opacity = "1";
+
+                var token = document.getElementById("token").value;
+
+                if(socket && socket.connected){
+                    socket.emit("login", token, (status) => {
+                        if(status === "good") {
+                            socket.close();
+                            setCookie("server", server);
                             setCookie("token", token);
-                            location.reload();
-                        }
-                    }).fail(function() {
-                        // Auth failure
-                        if(document.getElementById("invalid-token").style.display === "none") {
-                            document.getElementById("invalid-token").style.display = "block";
+                            setTimeout(() => {
+                                location.reload();
+                            }, 250);
                         } else {
-                            var $animate = $("#invalid-token");
-                            $animate.addClass("uk-animation-shake");
-                            $animate.one("webkitAnimationEnd oanimationend msAnimationEnd animationend",   
-                            function() {
-                                $animate.removeClass("uk-animation-shake");
-                                $animate.removeClass("uk-animation-fade");
-                            });
+                            setTimeout(() => {
+                                document.getElementById("loading").style.display = "none";
+                            }, 300);
+                            document.getElementById("loading").style.opacity = "0";
+                            showError("Token invalid.", "TOKEN");
+                            document.getElementById("token").focus();
                         }
                     });
+                } else {
+                    if(page >= 2) {
+                        setTimeout(() => {
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("server").focus();
+                        }, 400);
+                        document.getElementById("loading").style.opacity = "0";
+                        document.getElementById("login-content").style.transform = "translate(0px,0px)";
+                        showError("Server disconnected.", "SERVER");
+                        page = 1;
+                    }
+                }
+            }
+
+            $(() => {
+                if (window.matchMedia("only screen and (max-width: 760px)").matches) {
+                    document.querySelectorAll("body > div").forEach((val) => {
+                        val.setAttribute("hidden", "");
+                    });
+                    document.querySelector("body > p").removeAttribute("hidden");
+                }
+
+                setTimeout(() => {
+                    document.getElementById("logo").style.opacity = "1";
+                    setTimeout(() => {
+                        document.querySelector("#back-svg").style.opacity = "1";
+                    }, 500);
+                    setInterval(() => {
+                        document.getElementById("logo-path").style.opacity = "0.2";
+                        setTimeout(() => {
+                            document.getElementById("logo-path").style.opacity = "1";
+                        }, 2000);
+                    }, 4000);
+                }, 2000);
+                
+                document.getElementById("token").addEventListener("keyup", function(e) {
+                    if (e.keyCode === 13) {
+                        e.preventDefault();
+                        validateToken();
+                    }
+                });
+
+                document.getElementById("server").addEventListener("keyup", function(e) {
+                    if (e.keyCode === 13) {
+                        e.preventDefault();
+                        validateServer();
+                    }
                 });
             });
             

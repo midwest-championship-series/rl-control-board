@@ -158,6 +158,8 @@
     }
     #match-clock p {
         font-size: 35px;
+        line-height: 42px;
+        max-height: 42px;
         font-weight: bolder;
         font-family: 'Montserrat', sans-serif;
         text-align: center;
@@ -168,6 +170,7 @@
         font-size: 35px;
         line-height: 52px;
         min-height: 52px;
+        max-height: 52px;
         font-weight: bolder;
         font-family: 'Montserrat', sans-serif;
         font-style: italic;
@@ -295,10 +298,10 @@
 
 <rl-scene hidden id="match-scene" name="MATCH">
     <div id="match-details">
-        <div id="match-game-info" style="display: block;position: absolute; top:0px; left:30px;background-color: black;border-top-right-radius: 10px; border-top-left-radius: 10px; padding: 5px 15px;">
+        <div id="match-game-info" style="display: none;position: absolute; top:0px; left:30px;background-color: black;border-top-right-radius: 10px; border-top-left-radius: 10px; padding: 5px 15px;">
             <p style="color: white; font-family:'Montserrat', sans-serif; font-size:16px;" id="match-title">ERROR</p>
         </div>
-        <div class="container" id="match-scoreboard" style="display: block;position: absolute; top: 30px; left: 30px;z-index: 99;">
+        <div class="container" id="match-scoreboard" style="display: none;position: absolute; top: 30px; left: 30px;z-index: 99;">
             <div class="row" id="match-main-row" style="overflow: hidden;">
                 <div class="col" id="match-home-team" style="overflow: hidden;">
                     <!-- left team -->
@@ -316,7 +319,7 @@
                 </div>
                 <div class="col-2" id="match-game-score">
                     <!-- game score -->
-                    <span class="align-middle" style="display: inline-block;" id="match-gscore">0 - 0</span>
+                    <span class="align-middle" style="display: inline-block;line-height: 42px;max-height: 42px;" id="match-gscore">0 - 0</span>
                 </div>
                 <div class="col" id="match-away-team">
                     <!-- right team -->
@@ -491,16 +494,18 @@
         return clock_string;
     }
 
+    let lastGame = {};
+
     function findPlayer(id) {
         let player = {};
         let team = "";
-        Object.values(game["homeTeam"]["players"]).forEach((entry) => {
+        Object.values(lastGame["homeTeam"]["players"]).forEach((entry) => {
             if(entry["id"] === id) {
                 player = entry;
                 team = "homeTeam";
             }
         });
-        Object.values(game["awayTeam"]["players"]).forEach((entry) => {
+        Object.values(lastGame["awayTeam"]["players"]).forEach((entry) => {
             if(entry["id"] === id) {
                 player = entry;
                 team = "awayTeam";
@@ -700,7 +705,7 @@
         //testStatfeed();
         //testBoost();
 
-        Relay.addListener("status_update", (data) => {
+        Relay.addListener("status_changed", (data) => {
             if(data["status"] === "INITIALIZED") {
                 
                 // match-boomermeter
@@ -717,7 +722,8 @@
                             resetMeter();
                         });
                     } else if(ev["event"] === "game:goal_scored") {
-                        match_lastGoalSpeed = ev["data"]["ball_speed"];
+                        console.log(ev);
+                        match_lastGoalSpeed = (ev["data"]["goalspeed"]*0.621371).toFixed(0);
                         let { player, team } = findPlayer(ev["data"]["scorer"]["id"]);
                         document.getElementById("match-boomermeter").style.backgroundColor = team === "homeTeam" ? match_homeTeamPrimary : match_awayTeamPrimary;
                         document.getElementById("match-boomermeter-bar").style.backgroundColor = team === "homeTeam" ? match_homeTeamSecondary : match_awayTeamSecondary;
@@ -727,11 +733,8 @@
                 // match-replay
                 Relay.socket.on("update state", (match) => {
                     let game = match["game"];
-                    if(!game["hasGame"] || !game["inReplay"]) 
+                    if(!game["hasGame"]) 
                         document.getElementById("match-replay").style.display = "none";
-                    else {
-                        document.getElementById("match-replay").style.display = "block";
-                    }
                 });
 
                 // match-replay
@@ -751,11 +754,13 @@
                         document.getElementById("match-replay").style.width = (width + 140) + "px";
 
                         // Transition
-                        let midpoint = transition(1.4);
-
                         setTimeout(() => {
-                            document.getElementById("match-replay").style.display = "block";
-                        }, midpoint * 1000);
+                            let midpoint = transition(1.2);
+
+                            setTimeout(() => {
+                                document.getElementById("match-replay").style.display = "block";
+                            }, midpoint * 1000);
+                        }, 2500);
                     }
                 });
 
@@ -767,17 +772,18 @@
 
                         if(stat === "Demo") {
                             let { mainTarget, mainTeam } = findPlayer(data['main_target']['id']);
-                            let { secondaryTarget, secondaryTeam } = findPlayer(data['main_target']['id']);
-                            addDemoEvent(mainTarget['name'], mainTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), secondaryTarget['name'], secondaryTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary));
+                            let { secondaryTarget, secondaryTeam } = findPlayer(data['secondary_target']['id']);
+                            addDemoEvent(data['main_target']['name'], mainTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), data['secondary_target']['name'], secondaryTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary));
                         } else {
                             let { player, team } = findPlayer(data['main_target']['id']);
-                            addEvent(player['name'], team === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), stat);
+                            addEvent(data['main_target']['name'], team === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), stat);
                         }
                     }
                 })
 
                 // match-statfeed
                 Relay.socket.on("update state", (match) => {
+                    lastGame = match["game"];
                     if(match["game"] && match["game"]["homeTeam"]) {
                         match_homeTeamPrimary = match["game"]["homeTeam"]["colors"]["homePrimary"];
                         match_awayTeamPrimary = match["game"]["awayTeam"]["colors"]["awayPrimary"];
@@ -791,7 +797,11 @@
                     let game = match["game"];
                     if(!game["hasGame"]) {
                         document.getElementById("match-details").style.display = "none";
+                        document.getElementById('match-game-info').style.display = "none";
+                        document.getElementById('match-scoreboard').style.display = "none";
                     } else {
+                        document.getElementById("match-details").style.display = "block";
+                        console.log("updating match-details");
                         var clock = (game['isOT'] ? '+' : '') + secondsToTime(game["time"], game["time"] <= 60 && !game["isOT"]);
                         document.getElementById("match-clockp").innerText = clock;
                         document.getElementById("match-gscore").innerText = game["homeTeam"]["score"] + " - " + game["awayTeam"]["score"];
@@ -804,15 +814,15 @@
 
 
                         var homeWidth = displayTextWidth(homeName, 'italic 800 35pt Montserrat');
-                        var homeSize = 36;
-                        while(homeWidth >= 355) {
+                        var homeSize = 35;
+                        while(homeWidth >= 340) {
                             homeSize--;
                             homeWidth = displayTextWidth(homeName, 'italic 800 ' + homeSize + 'pt Montserrat');
                         }
                         
                         var awayWidth = displayTextWidth(awayName, 'italic 800 35pt Montserrat');
-                        awaySize = 36;
-                        while(awayWidth >= 355) {
+                        awaySize = 35;
+                        while(awayWidth >= 340) {
                             awaySize--;
                             awayWidth = displayTextWidth(awayName, 'italic 800 ' + awaySize + 'pt Montserrat');
                         }
@@ -824,8 +834,8 @@
 
                         document.getElementById("match-home-img").src = game["homeTeam"]["avatar"];
                         document.getElementById("match-away-img").src = game["awayTeam"]["avatar"];
-                        document.getElementById("postgame-hteam-series").innerHTML = "";
-                        document.getElementById("postgame-ateam-series").innerHTML = "";
+                        document.getElementById("match-hteam-series").innerHTML = "";
+                        document.getElementById("match-ateam-series").innerHTML = "";
                         
                         let stw = Math.ceil(match["bestOf"] / 2);
                         for(var i = 1; i <= stw; i++){
@@ -845,7 +855,7 @@
 
                 // match-details
                 Relay.socket.on("game event", (ev) => {
-                    if(ev.event === "game:match_ended") {
+                    if(ev["event"] === "game:match_ended") {
                         animateCSS("#match-game-info", "fadeOut").then((message) => {
                             console.log('animationend: setting scoreboard display to none');
                             document.getElementById('match-game-info').style.display = "none";
@@ -854,11 +864,14 @@
                             console.log('animationend: setting scoreboard display to none');
                             document.getElementById('match-scoreboard').style.display = "none";
                         });
-                    } else if(ev.event === "game:initialized") {
+                    } else if(ev["event"] === "game:initialized") {
+                        console.log("initializing scoreboard");
                         document.getElementById('match-scoreboard').style.display = "block";
                         document.getElementById('match-game-info').style.display = "block";
 
-                        animateCSS("#match-game-info", "backInLeft");
+                        animateCSS("#match-game-info", "backInLeft").then((message) => {
+
+                        });
                         animateCSS("#match-scoreboard", "fadeIn");
                     }
                 });
@@ -872,6 +885,7 @@
                         else if(game["inReplay"])
                             document.getElementById("match-player").style.display = "none";
                         else {
+                            console.log("updating match-player");
                             document.getElementById("match-player").style.display = "block";
                             var { player, team } = findPlayer(game["target"]);
 
@@ -903,7 +917,7 @@
                 // match-boost
                 Relay.socket.on("update state", (match) => {
                     let game = match["game"];
-                    if(!game["hasTarget"] && !game["isReplay"]) {
+                    if((!game["hasTarget"] && !game["isReplay"]) || game["hasWinner"]) {
                         document.getElementById("match-boost").style.display = "none";
                     } else {
                         document.getElementById("match-boost").style.display = "block";

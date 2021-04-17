@@ -15,18 +15,6 @@
 
         <!-- Only keep styles here temporarily, move to scss after -->
         <style>
-            #cbTopbar {
-                border-radius: 5px;
-                min-width: 430px;
-                max-width: 430px;
-                min-height: 60px;
-                max-height: 60px;
-                position: fixed;
-                margin: 0 auto;
-                z-index: 5;
-                top: 15px;
-                right: 35px;
-            }
             #cbSidebar {
                 min-width: 180px;
                 max-width: 180px;
@@ -37,64 +25,6 @@
                 left: 0px;
                 top: 0px;
                 overflow-x: hidden;
-            }
-            .server-box-sizing {
-                min-width: 420px;
-                max-width: 420px;
-                min-height: 55px;
-                max-height: 55px;
-                text-align: left;
-            }
-            #server-box {
-                background-color: green;
-                border-radius: 10px;
-                padding: 10px;
-            }
-            #server-dropdown {
-                padding: 5px !important;
-                margin-top: 0px !important;
-                width: 100%;
-            }
-            .server-button {
-                min-width: 100%;
-                max-width: 100%;
-                min-height: 65px;
-                max-height: 65px;
-                text-align: left;
-                padding-bottom: 10px;
-                transition: 0.3s;
-            }
-            .server-button span {
-                display: block;
-            }
-            .server-button span p {
-                margin: 0;
-                max-height: 25px;
-                text-transform: none;
-            }
-            .server-button:hover {
-                background-color:#999;
-            }
-            #server-selector button.uk-active {
-                background-color: #ddd;
-            }
-            #server-selector button.uk-active:hover {
-                background-color: #999;
-            }
-            .server-button span p:nth-child(2) {
-                font-size: 12px;
-            }
-            #server-dropdown-button {
-                background-color: #00000000;
-                position: relative;
-            }
-            #server-dropdown-button span p {
-                margin: 0;
-                min-height: 20px;
-                max-height: 20px;
-            }
-            #server-dropdown-button span p:nth-child(2) {
-                font-size: 12px;
             }
             .uk-notification-message {
                 font-size: 1em;
@@ -186,23 +116,7 @@
 
         <%- include('screens/loading.ejs'); %>
         <%- include('screens/reconnecting.ejs'); %>
-        
-        <!-- top bar -->
-        <div id="cbTopbar">
-            <div class="uk-inline" class="server-box-sizing" id="server-box">
-                <button id="server-dropdown-button" class="server-box-sizing" type="button">
-                    <span>
-                        <p id="server-dropdown-name" style="margin-top: 7px;" class="cbCurrentServerName">Choose server...</p>
-                        <p id="server-dropdown-status" style="display: none;"></p>
-                    </span>
-                </button>
-                <div id="server-dropdown" uk-dropdown="animation: false;duration: 0;mode: click">
-                    <div id="server-selector" uk-switcher="toggle: > *">
 
-                    </div>
-                </div>
-            </div>
-        </div>
         <div id="cbSidebar">
             <!-- side bar -->
             <h2>Control Board</h2>

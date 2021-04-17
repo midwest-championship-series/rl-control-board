@@ -103,8 +103,8 @@
         let hTeam = mCurTeamList.find(x => x.name === document.getElementById("home-team-input").value);
         let aTeam = mCurTeamList.find(x => x.name === document.getElementById("away-team-input").value);
         if(hTeam && aTeam) {
-            hTeam.series = document.getElementById("home-team-score-input").value;
-            aTeam.series = document.getElementById("away-team-score-input").value;
+            hTeam.series = Number(document.getElementById("home-team-score-input").value);
+            aTeam.series = Number(document.getElementById("away-team-score-input").value);
 
             Game.setHomeTeam(hTeam, (err, reply) => {
                 if(err)
