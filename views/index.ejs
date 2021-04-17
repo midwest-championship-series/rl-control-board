@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="background: rgb(108,172,220);">
+<html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,8 +56,18 @@
                 transform: translate(0px, -50%);
                 overflow: hidden;
             }
-            .uk-input {
-                border: 1px solid #000; 
+            #login-content {
+                width: 980px;
+                height: 200px;
+                transition: transform 0.75s;
+                transform: translate(0px, 0px);
+                margin-left: -40px;
+                display: flex;
+                flex-direction: row;
+            }
+            #login-content div {
+                width: 490px;
+                height: 200px;
             }
             #loading {
                 z-index:3;
@@ -129,10 +139,6 @@
         <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.15/dist/js/uikit-icons.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
         <script>
-            $(() => {
-                $("#login-form").submit(function (evt) {
-                    evt.preventDefault();
-                    var token = document.getElementById("login-token").value;
 
             function showError(msg, type) {
                 if(type === "SERVER") {
@@ -273,29 +279,13 @@
                 });
             });
             
-            // setCookie & getCookie from https://www.w3schools.com/js/js_cookies.asp
+            // setCookie from https://www.w3schools.com/js/js_cookies.asp
             function setCookie(cname, cvalue, exdays) {
                 var d = new Date();
                 d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
                 var expires = "expires="+d.toUTCString();
                 document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
             }
-
-            function getCookie(cname) {
-                var name = cname + "=";
-                var ca = document.cookie.split(';');
-                for(var i = 0; i < ca.length; i++) {
-                    var c = ca[i];
-                    while (c.charAt(0) == ' ') {
-                        c = c.substring(1);
-                    }
-                    if (c.indexOf(name) == 0) {
-                        return c.substring(name.length, c.length);
-                    }
-                }
-                return "";
-            }
-
         </script>
     </body>
 </html>
