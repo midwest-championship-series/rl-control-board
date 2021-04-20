@@ -1,6 +1,7 @@
 const fs = require('fs');
 const unzipper = require('unzipper');
 const mime = require('mime-types');
+const HTMLParser = require('node-html-parser');
 
 function cleanup(scene, res, success = false) {
     if(!success) {
@@ -83,7 +84,42 @@ exports.processScene = (scene, res) => {
                                             if(err)
                                                 cleanup(scene, res);
                                             else {
-                                                fs.writeFile('./scenes/' + scene + '/.scene', "{\"show\":{},\"hide\": {}}", 'utf-8', (err) => {
+
+                                                let sceneData = {
+                                                    show: {
+                                                        event: "NO EVENT",
+                                                        transition: false,
+                                                        transition_rate: 1,
+                                                        delay: 0
+                                                    },
+                                                    hide: {
+                                                        event: "NO EVENT",
+                                                        transition: false,
+                                                        transition_rate: 1,
+                                                        delay: 0
+                                                    }
+                                                };
+                                                // Parse html
+                                                var root = HTMLParser.parse(newText);
+                                                var elm = root.querySelector("rl-scene");
+
+                                                // Populate show event
+                                                if(elm.getAttribute("show-event")) {
+                                                    sceneData.show.event = elm.getAttribute("show-event");
+                                                    sceneData.show.transition = elm.getAttribute("show-transition") === "true" ? true : false;
+                                                    sceneData.show.transition_rate = elm.getAttribute("show-transition-rate") ? Number(elm.getAttribute("show-transition-rate")) : 1;
+                                                    sceneData.show.delay = elm.getAttribute("show-delay") ? Number(elm.getAttribute("show-delay")) : 0;
+                                                }
+
+                                                // Populate hide event
+                                                if(elm.getAttribute("hide-event")) {
+                                                    sceneData.hide.event = elm.getAttribute("hide-event");
+                                                    sceneData.hide.transition = elm.getAttribute("hide-transition") === "true" ? true : false;
+                                                    sceneData.hide.transition_rate = elm.getAttribute("hide-transition-rate") ? Number(elm.getAttribute("hide-transition-rate")) : 1;
+                                                    sceneData.hide.delay = elm.getAttribute("hide-delay") ? Number(elm.getAttribute("hide-delay")) : 0;
+                                                }
+
+                                                fs.writeFile('./scenes/' + scene + '/.scene', JSON.stringify(sceneData), 'utf-8', (err) => {
                                                     if(err)
                                                         cleanup(scene, res);
                                                     else {

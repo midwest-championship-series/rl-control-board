@@ -1,6 +1,7 @@
 <style>
-    #settings-container {
+    #teams-container {
         margin-left: 30px;
+        margin-top: 40px;
     }
     .team-logo {
         display: inline-block;
@@ -27,20 +28,16 @@
     }
     #teams-list button {
         align-self: center;
+        line-height: 30px;
     }
 </style>
 
-<p>Settings (Teams & Servers)</p>
-
-<!--
-    
--->
-<div id="settings-container">
+<div id="teams-container">
     <div>
         <h3 style="display: inline-block;margin-bottom: 0px;">Teams</h3>
         <button style="margin-left: 15px;display: inline-block;font-size:15px;text-transform:none;" class="uk-button uk-button-text" uk-toggle="target: #add-team-modal">+ Add New Team</button>
     </div>
-    <button style="margin-top:5px;" class="uk-button uk-button-primary uk-button-small" onclick="setRefreshTeams()">Refresh</button>
+    <button style="margin-top:5px;margin-bottom:30px;" class="uk-button uk-button-primary uk-button-small" onclick="setRefreshTeams()">Refresh</button>
     <!--<ul class="uk-list uk-list-striped" id="teams-list" style="max-width: 500px;border: solid 2px #09f;"></ul>-->
 
     <div id="teams-list">
@@ -70,15 +67,7 @@ function setRefreshTeams() {
 }
 
 ServerManager.addListener("status_changed", (data) => {
-    if(data["status"] === "CONNECTED") {
-
-        Relay.socket.emit("get teams", (teams, err) => {
-            if(!err) {
-                sCurTeamList = teams;
-                setUpdateTeamsList(teams);
-            } else
-                console.log(err);
-        });
+    if(data["status"] === "INITIALIZED") {
 
         Relay.socket.on("teams refreshed", (teams) => {
             sendNotification("Teams refreshed");
@@ -103,6 +92,14 @@ ServerManager.addListener("status_changed", (data) => {
             sCurTeamList = sCurTeamList.filter(x => x.name !== name);
             sCurTeamList.push(team);
             setUpdateTeamsList(sCurTeamList);
+        });
+    } else if(data["status"] === "CONNECTED") {
+        Relay.socket.emit("get teams", (teams, err) => {
+            if(!err) {
+                sCurTeamList = teams;
+                setUpdateTeamsList(teams);
+            } else
+                console.log(err);
         });
     }
 });

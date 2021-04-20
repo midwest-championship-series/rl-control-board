@@ -306,6 +306,7 @@ $(() => {
 
     $("#logout").click((e) => {
         setCookie("token", "");
+        setCookie("server", "");
         location.reload();
     });
 

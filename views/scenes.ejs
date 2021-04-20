@@ -4,9 +4,9 @@
         flex-flow: row wrap;
         margin-left: 40px;
         max-height: 220px;
+        margin-top: 40px;
     }
 </style>
-<p>Scenes</p>
 
 <!-- The date is 3/4/2021. 10:21 PM. chezy had a brilliant foken idea, aight? 
     Allow the user to upload .html files to use as scenes.
@@ -44,7 +44,8 @@
     <div class="panel panel-pad" style="border: 4px dashed black;min-height: 0px;">
         <div class="uk-grid-small" uk-grid>
             <h2 style="width: 100%;text-align:center;">Scene Events</h2>
-            <select id="update-scene-input" class="uk-select" onchange="sceneUpdateScenesVisibilityChanged(this.value !== '-')" style="width: 100%;margin-left:10px;">
+            <p style="width:100%;text-align:center;">disabled: add events when you declare rl-scene now</p>
+            <select id="update-scene-input" disabled class="uk-select" onchange="sceneUpdateScenesVisibilityChanged(this.value !== '-')" style="width: 100%;margin-left:10px;">
                 <!-- Populate with scenes -->
                 <option value="-" selected> --- Select Scene --- </option>
             </select>
@@ -110,7 +111,7 @@
                 </div>
             </div>
             <div class="uk-width-1-1">
-                <button class="uk-button uk-button-primary" style="width: 100%;margin-left: 0px;" onclick="sceneUpdateSceneEvents()">Update Events For Scene</button>
+                <button class="uk-button uk-button-primary" style="width: 100%;margin-left: 0px;" disabled onclick="sceneUpdateSceneEvents()">Update Events For Scene</button>
             </div>
         </div>
     </div>

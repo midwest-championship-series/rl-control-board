@@ -7,6 +7,7 @@
         display: flex;
         flex-flow: row wrap;
         margin-left: 40px;
+        margin-top: 40px;
     }
     #monitor-container .panel {
         background-color: #18181b;
@@ -18,8 +19,6 @@
         text-align: center;
     }
 </style>
-
-<p>Monitor</p>
 
 <div id="monitor-container">
     <div class="panel-2 panel-float" style="background-color: #0000;">
@@ -166,11 +165,6 @@
                 monitorUpdateScenesView();
             });
 
-            Relay.socket.emit("get overlays", (overlays) => {
-                monitorClients = overlays;
-                monitorUpdateOverlays();
-            })
-
             Relay.socket.on("overlay activated", (name) => {
                 sendNotification("Overlay activated! ["+name+"]");
                 monitorClients.push(name);
@@ -180,6 +174,14 @@
             Relay.socket.on("deactivate", (name) => {
                 sendNotification("Overlay deactivated. ["+name+"]");
                 monitorClients = monitorClients.filter(x => x !== name);
+                monitorUpdateOverlays();
+            });
+        } else if(data["status"] === "CONNECTED") {
+            console.log("logged in, getting overlays");
+            Relay.socket.emit("get overlays", (overlays) => {
+                if(overlays.length > 0)
+                    sendNotification(overlays.length + " overlay"+(overlays.length > 1 ? "s" : "")+" connected.");
+                monitorClients = overlays;
                 monitorUpdateOverlays();
             });
         }

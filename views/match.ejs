@@ -3,10 +3,9 @@
         display: flex;
         flex-flow: row wrap;
         margin-left: 40px;
+        margin-top: 40px;
     }
 </style>
-
-<p>Match</p>
 
 <div id="match-container">
     <div class="panel-1-half panel-pad" style="height: 305px;border: 4px dashed black;">
@@ -126,32 +125,7 @@
         });
     }
     ServerManager.addListener("status_changed", (data) => {
-        if(data["status"] === "CONNECTED") {
-
-            
-            Relay.socket.emit("get teams", (teams, err) => {
-                if(!err) {
-                    mCurTeamList = teams;
-                    matchPopulateSelects(mCurTeamList);
-
-                    Relay.socket.emit("get match info", (match, err) => {
-                        if(!err) {
-                            console.log(match);
-                            let game = match.game ?? {};
-                            document.getElementById("match-title-input").value = match.matchTitle ?? "Minnesota Championship Series";
-                            document.getElementById("best-of-input").value = match.bestOf ?? 5;
-                            document.getElementById("team-size-input").value = match.teamSize ?? 3;
-                            document.getElementById("home-team-input").value = (game.homeTeam ? game.homeTeam.name : "-") ?? "-";
-                            document.getElementById("away-team-input").value = (game.awayTeam ? game.awayTeam.name : "-") ?? "-";
-                            document.getElementById("home-team-score-input").value = (game.homeTeam ? game.homeTeam.series : 0) ?? 0;
-                            document.getElementById("away-team-score-input").value = (game.awayTeam ? game.awayTeam.series : 0) ?? 0;
-                        } else
-                            console.log(err);
-                    });
-                } else
-                    console.log(err);
-            });
-
+        if(data["status"] === "INITIALIZED") {
             Relay.socket.on("match info updated", (match) => {
                 console.log(match);
                 sendNotification("Match info updated!");
@@ -202,6 +176,29 @@
             Relay.socket.on("game ended", (match) => {
                 document.getElementById("home-team-score-input").value = match.game.homeTeam.series;
                 document.getElementById("away-team-score-input").value = match.game.awayTeam.series;
+            });
+        } else if(data["status"] === "CONNECTED") {
+            Relay.socket.emit("get teams", (teams, err) => {
+                if(!err) {
+                    mCurTeamList = teams;
+                    matchPopulateSelects(mCurTeamList);
+
+                    Relay.socket.emit("get match info", (match, err) => {
+                        if(!err) {
+                            console.log(match);
+                            let game = match.game ?? {};
+                            document.getElementById("match-title-input").value = match.matchTitle ?? "Minnesota Championship Series";
+                            document.getElementById("best-of-input").value = match.bestOf ?? 5;
+                            document.getElementById("team-size-input").value = match.teamSize ?? 3;
+                            document.getElementById("home-team-input").value = (game.homeTeam ? game.homeTeam.name : "-") ?? "-";
+                            document.getElementById("away-team-input").value = (game.awayTeam ? game.awayTeam.name : "-") ?? "-";
+                            document.getElementById("home-team-score-input").value = (game.homeTeam ? game.homeTeam.series : 0) ?? 0;
+                            document.getElementById("away-team-score-input").value = (game.awayTeam ? game.awayTeam.series : 0) ?? 0;
+                        } else
+                            console.log(err);
+                    });
+                } else
+                    console.log(err);
             });
         }
     });

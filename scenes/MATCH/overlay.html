@@ -296,12 +296,12 @@
     }
 </style>
 
-<rl-scene hidden id="match-scene" name="MATCH">
-    <div id="match-details">
-        <div id="match-game-info" style="display: none;position: absolute; top:0px; left:30px;background-color: black;border-top-right-radius: 10px; border-top-left-radius: 10px; padding: 5px 15px;">
+<rl-scene hidden id="match-scene" show-event="game:initialized" show-transition="true" show-transition-rate="1.1" hide-event="game:match_ended" hide-delay="7000" name="MATCH">
+    <div id="match-details" style="display: none;">
+        <div id="match-game-info" style="display: block;position: absolute; top:0px; left:30px;background-color: black;border-top-right-radius: 10px; border-top-left-radius: 10px; padding: 5px 15px;">
             <p style="color: white; font-family:'Montserrat', sans-serif; font-size:16px;" id="match-title">ERROR</p>
         </div>
-        <div class="container" id="match-scoreboard" style="display: none;position: absolute; top: 30px; left: 30px;z-index: 99;">
+        <div class="container" id="match-scoreboard" style="display: block;position: absolute; top: 30px; left: 30px;z-index: 99;">
             <div class="row" id="match-main-row" style="overflow: hidden;">
                 <div class="col" id="match-home-team" style="overflow: hidden;">
                     <!-- left team -->
@@ -548,7 +548,6 @@
         return Math.floor(Math.random() * (max - min) ) + min;
     }
 
-
     function hexToRgb(hex) {
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
         var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -755,12 +754,12 @@
 
                         // Transition
                         setTimeout(() => {
-                            let midpoint = transition(1.2);
+                            let midpoint = transition(1.3);
 
                             setTimeout(() => {
                                 document.getElementById("match-replay").style.display = "block";
                             }, midpoint * 1000);
-                        }, 2500);
+                        }, 2000);
                     }
                 });
 
@@ -771,8 +770,8 @@
                         var stat = match_displayConversionMap[data["type"]] || data["type"];
 
                         if(stat === "Demo") {
-                            let { mainTarget, mainTeam } = findPlayer(data['main_target']['id']);
-                            let { secondaryTarget, secondaryTeam } = findPlayer(data['secondary_target']['id']);
+                            let { player: mainPlayer, team: mainTeam } = findPlayer(data['main_target']['id']);
+                            let { player: secondaryTarget, team: secondaryTeam } = findPlayer(data['secondary_target']['id']);
                             addDemoEvent(data['main_target']['name'], mainTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary), data['secondary_target']['name'], secondaryTeam === "homeTeam" ? hexToRgb(match_homeTeamPrimary) : hexToRgb(match_awayTeamPrimary));
                         } else {
                             let { player, team } = findPlayer(data['main_target']['id']);
@@ -797,10 +796,8 @@
                     let game = match["game"];
                     if(!game["hasGame"]) {
                         document.getElementById("match-details").style.display = "none";
-                        document.getElementById('match-game-info').style.display = "none";
-                        document.getElementById('match-scoreboard').style.display = "none";
                     } else {
-                        document.getElementById("match-details").style.display = "block";
+                        document.getElementById('match-details').style.display = "block";
                         console.log("updating match-details");
                         var clock = (game['isOT'] ? '+' : '') + secondsToTime(game["time"], game["time"] <= 60 && !game["isOT"]);
                         document.getElementById("match-clockp").innerText = clock;
@@ -854,21 +851,34 @@
                 });
 
                 // match-details
+                Relay.socket.emit("get match info", (match, err) => {
+                    if(!err) {
+                        // show scoreboard if match already started
+                        if(match["game"]["time"] < 300) {
+                            document.getElementById("match-game-info").style.display = "block";
+                            document.getElementById("match-scoreboard").style.display = "block";
+                            document.getElementById('match-details').style.display = "block";
+                        }
+                    }
+                });
+
+                // match-details
                 Relay.socket.on("game event", (ev) => {
                     if(ev["event"] === "game:match_ended") {
                         animateCSS("#match-game-info", "fadeOut").then((message) => {
                             console.log('animationend: setting scoreboard display to none');
-                            document.getElementById('match-game-info').style.display = "none";
+                            document.getElementById('match-details').style.display = "none";
+                            document.getElementById("match-game-info").style.display = "none";
                         });
                         animateCSS("#match-scoreboard", "fadeOut").then((message) => {
                             console.log('animationend: setting scoreboard display to none');
-                            document.getElementById('match-scoreboard').style.display = "none";
+                            document.getElementById('match-details').style.display = "none";
+                            document.getElementById("match-scoreboard").style.display = "none";
                         });
                     } else if(ev["event"] === "game:initialized") {
                         console.log("initializing scoreboard");
-                        document.getElementById('match-scoreboard').style.display = "block";
-                        document.getElementById('match-game-info').style.display = "block";
-
+                        document.getElementById("match-game-info").style.display = "block";
+                        document.getElementById("match-scoreboard").style.display = "block";
                         animateCSS("#match-game-info", "backInLeft").then((message) => {
 
                         });
@@ -882,7 +892,7 @@
                     if(game["hasGame"]) {
                         if(!game["hasTarget"])
                             document.getElementById("match-player").style.display = "none";
-                        else if(game["inReplay"])
+                        else if(game["isReplay"] || game["hasWinner"])
                             document.getElementById("match-player").style.display = "none";
                         else {
                             console.log("updating match-player");

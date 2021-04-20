@@ -71,6 +71,10 @@ app.post('/login', (req, res) => {
     return res.status(400).end();
 });
 
+/* 
+
+    POST /scenes endpoint no longer needed
+
 app.post('/scenes', (req, res) => {
     console.log(req.body.token);
     if(req.body.token && validateToken(req.body.token)) {
@@ -85,7 +89,7 @@ app.post('/scenes', (req, res) => {
             return res.status(200).end();
     }
     return res.status(400).send({status:false,message:'User not authenticated'}).end();
-});
+});*/
 
 app.post('/upload-scene', (req, res) => {
     if(req.body.token && validateToken(req.body.token)) {
