@@ -80,7 +80,7 @@
     }
 </style>
 
-<rl-scene hidden id="pregame-scene" name="PRE_GAME">
+<rl-scene hidden id="pregame-scene" hide-event="game:initialized" hide-delay="700" name="PRE_GAME">
     <div id="pregame-predictions" class="container" style="max-width:100% !important;position:absolute;top:0;left:0; z-index:10;margin-top:370px;padding-right:45px;display: flex;flex-direction:column;align-self:center;align-content:center;justify-content:center;width:100%;height:100%;opacity:0;">
         <div style="align-self:center;background-color: black;width:250px;height:30px;padding-left:17px;padding-top:5px;border-top-right-radius: 10px;margin-bottom:10px;border-top-left-radius: 10px;">
             <p class="montserrat" style="color: white;">
@@ -217,13 +217,13 @@
 
                 var blueNum = 1;
                 var orangeNum = 1;
-                match['game']['homeTeam']['players'].forEach(function(entry) {
+                Object.values(match['game']['homeTeam']['roster']).forEach(function(entry) {
                     if(blueNum <= match['teamSize']){
                         document.getElementById("pregame-blue-players").innerHTML += '<div class="pregame-blue-player" style="color:'+match["game"]["homeTeam"]["colors"]["homePrimary"]+';background:linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 7%, '+match["game"]["homeTeam"]["colors"]["homePrimary"]+' 8%, '+match["game"]["homeTeam"]["colors"]["homePrimary"]+' 11%, '+match["game"]["homeTeam"]["colors"]["homeSecondary"]+'88 12%, '+match["game"]["homeTeam"]["colors"]["homeSecondary"]+'88 94%, rgba(251,0,0,0) 95%);"><p class="pregame-player-name">'+entry.name+'</p></div>';
                         blueNum++;
                     }
                 });
-                match['game']['awayTeam']['players'].forEach(function(entry) {
+                Object.values(match['game']['awayTeam']['roster']).forEach(function(entry) {
                     if(orangeNum <= match['teamSize']){
                         document.getElementById("pregame-orange-players").innerHTML += '<div class="pregame-orange-player" style="color: '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+';background:linear-gradient(110deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 7%, '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+' 8%, '+match["game"]["awayTeam"]["colors"]["awayPrimary"]+' 11%, '+match["game"]["awayTeam"]["colors"]["awaySecondary"]+'88 12%, '+match["game"]["awayTeam"]["colors"]["awaySecondary"]+'88 94%, rgba(251,0,0,0) 95%);"><p class="pregame-player-name">'+entry.name+'</p></div>';
                         orangeNum++;

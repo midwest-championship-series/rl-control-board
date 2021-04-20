@@ -1,1 +1,1 @@
-{"show":{"event":"NO EVENT","transition":false,"transition_rate":1,"delay":0},"hide":{"event":"game:initialized","transition":false,"transition_rate":1.25,"delay":500}}
+{"show":{"event":"NO EVENT","transition":false,"transition_rate":1,"delay":0},"hide":{"event":"game:initialized","transition":false,"transition_rate":1,"delay":700}}

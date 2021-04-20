@@ -7,6 +7,7 @@
         display: flex;
         flex-flow: row wrap;
         margin-left: 40px;
+        margin-top: 40px;
     }
     #monitor-container .panel {
         background-color: #18181b;
@@ -18,8 +19,6 @@
         text-align: center;
     }
 </style>
-
-<p>Monitor</p>
 
 <div id="monitor-container">
     <div class="panel-2 panel-float" style="background-color: #0000;">
@@ -52,8 +51,7 @@
         </div>
     </div>
     <div class="panel panel-float panel-pad">
-        <div>
-            <p>bruv at least put a graph here chez</p>
+        <div style="color:white;" id="game-details-live">
         </div>
     </div>
 </div>
@@ -132,6 +130,31 @@
                 console.log(mCurScenes);
                 monitorUpdateScenesView();
             });
+
+            Relay.socket.on("game event", (event) => {
+                console.log(event);
+            })
+
+            Relay.socket.on("update state", (match) => {
+                let html = "";
+                let g = match["game"];
+                html += `<p>ballSpeed: ${g["ballSpeed"]}</p>`;
+                html += `<p>ballTeam: ${g["ballTeam"]}</p>`;
+                html += `<p>hasTarget: ${g["hasTarget"]}</p>`;
+                html += `<p>hasWinner: ${g["hasWinner"]}</p>`;
+                html += `<p>isReplay: ${g["isReplay"]}</p>`;
+                html += `<p>target: ${g["target"]}</p>`;
+                html += `<p>time: ${g["time"]}</p>`;
+                html += `<p>winner: ${g["winner"]}</p>`;
+                html += `<p>hasGame: ${g["hasGame"]}</p>`;
+                if(g["homeTeam"] && g["awayTeam"]) {
+                    html += `<p>homeTeamScore: ${g["homeTeam"]["score"]}</p>`;
+                    html += `<p>awayTeamScore: ${g["awayTeam"]["score"]}</p>`;
+                }
+
+                document.getElementById("game-details-live").innerHTML = html;
+            });
+
             Relay.socket.on("scene added", (name) => {
                 mCurScenes.push(name);
                 monitorUpdateScenesView();
@@ -142,11 +165,6 @@
                 monitorUpdateScenesView();
             });
 
-            Relay.socket.emit("get overlays", (overlays) => {
-                monitorClients = overlays;
-                monitorUpdateOverlays();
-            })
-
             Relay.socket.on("overlay activated", (name) => {
                 sendNotification("Overlay activated! ["+name+"]");
                 monitorClients.push(name);
@@ -156,6 +174,14 @@
             Relay.socket.on("deactivate", (name) => {
                 sendNotification("Overlay deactivated. ["+name+"]");
                 monitorClients = monitorClients.filter(x => x !== name);
+                monitorUpdateOverlays();
+            });
+        } else if(data["status"] === "CONNECTED") {
+            console.log("logged in, getting overlays");
+            Relay.socket.emit("get overlays", (overlays) => {
+                if(overlays.length > 0)
+                    sendNotification(overlays.length + " overlay"+(overlays.length > 1 ? "s" : "")+" connected.");
+                monitorClients = overlays;
                 monitorUpdateOverlays();
             });
         }

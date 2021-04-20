@@ -5,7 +5,7 @@
     #reconnecting-container {
         min-width: 100%;
         min-height: 100%;
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         z-index: 99;
@@ -25,7 +25,7 @@
 </style>
 
 <div id="reconnecting-container">
-    <p style="color: #f90;font-size: 32px;">Reconnecting...</p>
+    <p style="color: #000;font-size: 32px;">Reconnecting...</p>
     <button id="disconnect-button" onclick="disconnect()">Disconnect</button>
 </div>
 
@@ -36,9 +36,9 @@
         if(data["status"] === "CONNECTED") {
             document.getElementById("reconnecting-container").style.opacity = "0";
             setTimeout(() => {
+                document.body.style.overflow = "auto";
                 document.getElementById("reconnecting-container").style.display = "none";
             }, 2000);
-            document.body.style.overflow = "auto";
         } else if(data["status"] === "DISCONNECTED"){
             document.getElementById("reconnecting-container").style.display = "flex";
             document.getElementById("reconnecting-container").style.opacity = "1";
@@ -47,7 +47,8 @@
     });
 
     function disconnect() {
-        setCookie("current_server", "");
+        setCookie("server", "");
+        setCookie("token", "");
         location.reload();
     }
 </script>

@@ -15,86 +15,17 @@
 
         <!-- Only keep styles here temporarily, move to scss after -->
         <style>
-            #cbTopbar {
-                border-radius: 5px;
-                min-width: 430px;
-                max-width: 430px;
-                min-height: 60px;
-                max-height: 60px;
-                position: fixed;
-                margin: 0 auto;
-                z-index: 5;
-                top: 15px;
-                right: 35px;
-            }
             #cbSidebar {
                 min-width: 180px;
                 max-width: 180px;
-                background-color: aqua;
+                background-color: rgb(108,172,220);
                 min-height: 100%;
                 max-height: 100%;
+                box-shadow: #333 3px 0px 5px;
                 position: fixed;
                 left: 0px;
                 top: 0px;
                 overflow-x: hidden;
-            }
-            .server-box-sizing {
-                min-width: 420px;
-                max-width: 420px;
-                min-height: 55px;
-                max-height: 55px;
-                text-align: left;
-            }
-            #server-box {
-                background-color: green;
-                border-radius: 10px;
-                padding: 10px;
-            }
-            #server-dropdown {
-                padding: 5px !important;
-                margin-top: 0px !important;
-                width: 100%;
-            }
-            .server-button {
-                min-width: 100%;
-                max-width: 100%;
-                min-height: 65px;
-                max-height: 65px;
-                text-align: left;
-                padding-bottom: 10px;
-                transition: 0.3s;
-            }
-            .server-button span {
-                display: block;
-            }
-            .server-button span p {
-                margin: 0;
-                max-height: 25px;
-                text-transform: none;
-            }
-            .server-button:hover {
-                background-color:#999;
-            }
-            #server-selector button.uk-active {
-                background-color: #ddd;
-            }
-            #server-selector button.uk-active:hover {
-                background-color: #999;
-            }
-            .server-button span p:nth-child(2) {
-                font-size: 12px;
-            }
-            #server-dropdown-button {
-                background-color: #00000000;
-                position: relative;
-            }
-            #server-dropdown-button span p {
-                margin: 0;
-                min-height: 20px;
-                max-height: 20px;
-            }
-            #server-dropdown-button span p:nth-child(2) {
-                font-size: 12px;
             }
             .uk-notification-message {
                 font-size: 1em;
@@ -105,30 +36,53 @@
                 margin-left: 180px;
             }
             .uk-tab > .uk-active > a {
-                border-right: 5px solid #1e87f0;
+                border-right: 5px solid #f90;
             }
             .uk-tab > * > a {
                 border-right: 5px solid #ccc;
                 background-color: #00000000;
+                color: #333;
                 font-size: 22px;
                 text-align: center;
                 transition: background-color .2s ease-in-out;
             }
             .uk-tab > * > a:hover {
-                background-color: rgb(0, 119, 255);
+                background-color: rgba(0, 119, 255, .5);
             }
             #sidebar-status {
                 position: absolute;
-                bottom: 45px;
+                bottom: 75px;
                 left: 10px;
                 z-index: 6;
                 min-width:160px;
             }
             #logout {
                 position: absolute;
-                left: 10px; 
-                bottom: 15px;
-                min-width: 160px;
+                left: 0px; 
+                bottom: 0px;
+                min-width: 180px;
+                min-height:60px;
+                display: flex;
+                border-top: black solid 1.5px;
+                background-color: #333;
+            }
+            #logout:hover {
+                text-decoration: none;
+            }
+            #logout span {
+                align-self: center;
+                margin-left: 10px;
+                color: #ccc;
+            }
+            #logout p {
+                align-self: center;
+                justify-self: center;
+                color: #ccc;
+                margin-left: 20px;
+                font-size: 20px;
+                line-height: 30px;
+                margin-top: 0;
+                margin-bottom: 3px;
             }
             .panel {
                 min-width: 480px; 
@@ -186,32 +140,17 @@
 
         <%- include('screens/loading.ejs'); %>
         <%- include('screens/reconnecting.ejs'); %>
-        
-        <!-- top bar -->
-        <div id="cbTopbar">
-            <div class="uk-inline" class="server-box-sizing" id="server-box">
-                <button id="server-dropdown-button" class="server-box-sizing" type="button">
-                    <span>
-                        <p id="server-dropdown-name" style="margin-top: 7px;" class="cbCurrentServerName">Choose server...</p>
-                        <p id="server-dropdown-status" style="display: none;"></p>
-                    </span>
-                </button>
-                <div id="server-dropdown" uk-dropdown="animation: false;duration: 0;mode: click">
-                    <div id="server-selector" uk-switcher="toggle: > *">
 
-                    </div>
-                </div>
-            </div>
-        </div>
         <div id="cbSidebar">
             <!-- side bar -->
-            <h2>Control Board</h2>
-            <p style="font-size: 10px; color:rgba(68, 68, 68, 0.527)">Super duper alpha prerelease not-styled-well half-functional not-production-ready bug-filled v0.0.0.0.1</p>
+            <img src="./img/mncs.png" width="180" height="180" />
+            <p style="color: white;margin: 0;font-size: 24px;text-align: center;margin-top: -30px;font-weight: bold;">Control Board</p>
+            <p style="display:none;font-size: 10px; color:rgba(68, 68, 68, 0.527)">Super duper alpha prerelease not-styled-well half-functional not-production-ready bug-filled v0.0.0.0.1</p>
             <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade">
                 <li><a href="#">Monitor</a></li>
                 <li><a href="#">Scenes</a></li>
                 <li><a href="#">Match</a></li>
-                <li><a href="#">Settings</a></li>
+                <li><a href="#">Teams</a></li>
             </ul>
             <div id="sidebar-status">
                 <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="max-width:19px;filter: drop-shadow(0 0 3px #000000cc);display:inline;margin-bottom:1.2px;">
@@ -219,7 +158,10 @@
                 </svg>
                 <p style="display:inline;font-size:16px;">Not connected</p>
             </div>
-            <button id="logout">Log out</button>
+            <a id="logout">
+                <span uk-icon="icon: sign-out; ratio:1.5"></span>
+                <p>Log out</p>
+            </a>
         </div>
         <div id="content">
             <div class="uk-width-expand@m">
@@ -227,14 +169,9 @@
                     <li><%- include('./monitor.ejs'); %></li>
                     <li><%- include('./scenes.ejs'); %></li>
                     <li><%- include('./match.ejs'); %></li>
-                    <li><%- include('./settings.ejs'); %></li>
+                    <li><%- include('./teams.ejs'); %></li>
                 </ul>
             </div>
         </div>
-        <script>
-            $(() => {
-
-            });
-        </script>
     </body>
 </html>

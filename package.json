@@ -9,7 +9,8 @@
     "build:docker": "docker build -t mncscontrolboard:dev -f ./Dockerfile .",
     "start": "node index.js",
     "start:dev": "yarn build && nodemon index.js",
-    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 9000:80 mncscontrolboard:dev"
+    "start:docker": "docker stop mncs-controlboard-dev; docker rm --force mncs-controlboard-dev; docker rmi mncscontrolboard:dev; yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 80:80 mncscontrolboard:dev",
+    "start:docker:win": "docker stop mncs-controlboard-dev & docker rm mncs-controlboard-dev & docker rmi mncscontrolboard:dev & yarn build:docker && docker run --name=mncs-controlboard-dev -d -p 80:80 mncscontrolboard:dev"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "mime-types": "^2.1.30",
+    "node-html-parser": "^3.1.5",
     "sass": "^1.32.6",
     "socket.io-client": "^4.0.1",
     "uglifycss": "0.0.29",

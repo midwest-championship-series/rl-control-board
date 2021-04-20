@@ -76,26 +76,29 @@ const Relay = {
 
         Relay.socket.on("connect", () => {
             Relay.socket.emit("mncs_register");
-            
+            console.log("connected");
 
-            Relay.socket.emit("login", getCookie("token"), (status) => {
-                if(status !== "good") {
-                    Relay.socket.loggedIn = false;
-                    Relay.socket.close();
-                    Relay.socketStatus = SocketStatus.DISCONNECTED;
-                    Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
-                    ServerManager.connectedServer = undefined;
-                    console.log("LOGIN FAIL");
-                } else {
-                    // Only send connected event if we are logged in, otherwise the controlboard is useless
-                    Relay.socket.loggedIn = true;
-                    Relay.socketStatus = SocketStatus.CONNECTED;
-                    Relay.statusUpdate(SocketStatus.CONNECTED, server);
-                    ServerManager.connectedServer = server;
-                }
-            });
+            setTimeout(() => {
+                Relay.socket.emit("login", getCookie("token"), (status) => {
+                    if(status !== "good") {
+                        Relay.socket.loggedIn = false;
+                        Relay.socket.close();
+                        Relay.socketStatus = SocketStatus.DISCONNECTED;
+                        Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
+                        ServerManager.connectedServer = undefined;
+                        console.log("LOGIN FAIL");
+                    } else {
+                        // Only send connected event if we are logged in, otherwise the controlboard is useless
+                        Relay.socket.loggedIn = true;
+                        Relay.socketStatus = SocketStatus.CONNECTED;
+                        Relay.statusUpdate(SocketStatus.CONNECTED, server);
+                        ServerManager.connectedServer = server;
+                    }
+                });
+            }, 500);
 
             Relay.socket.on("disconnect", () => {
+                console.log("connect error");
                 Relay.socket.loggedIn = false;
                 Relay.socketStatus = SocketStatus.DISCONNECTED;
                 Relay.statusUpdate(SocketStatus.DISCONNECTED, undefined);
@@ -266,45 +269,23 @@ function generateUUID() {
     });
 }
 
-function addServerDropdownButton(name, ip) {
-    document.getElementById('server-selector').innerHTML += '<button class="uk-button uk-button-default server-button" type="button"><span><p>'+name+'</p><p>'+ip+'</p></span></button>';
-}
-
-// TODO: complete this function
-function removeServerDropdownButton(name) {
-    
-}
-
 $(() => {
 
-    if(ServerManager.getServers().length === 0) {
-        ServerManager.addServer("Main Relay", "ws://relay.chezy.dev");
-        ServerManager.addServer("Local Relay", "ws://localhost:5566");
-    }
-    
-    ServerManager.getServers().forEach((entry) => {
-        addServerDropdownButton(entry["name"], entry["server"]);
-    });
 
     ServerManager.addListener("status_changed", (data) => {
         if(data["server"] === undefined && data["status"] === "DISCONNECTED") {
             UIkit.notification("Connection lost.", {pos: 'bottom-right'});
             $("#sidebar-status circle").attr("fill", "#f10");
             $("#sidebar-status p").text("Not connected.");
-            document.getElementById("server-dropdown-status").style.display = "none";
-            document.getElementById("server-dropdown-name").innerText = "Choose server...";
             $('.cbCurrentServerIP').each(function() {
                 $(this).text("");
             });
         } else if(data["status"] !== "INITIALIZED"){
             UIkit.notification("["+data["server"]+"] " + data["status"], {pos: 'bottom-right'});
-            document.getElementById("server-dropdown-status").style.display = "inline";
             if(data["status"] === "CONNECTING") {
-                document.getElementById("server-dropdown-status").innerHTML = 'Attempting to connect to <p class="cbCurrentServerIP" style="display: inline;"></p>';
                 $("#sidebar-status circle").attr("fill", "#E3D531");
                 $("#sidebar-status p").text("Connecting...");
             } else if(data["status"] === "CONNECTED") {
-                document.getElementById("server-dropdown-status").innerHTML = 'Connected to <p class="cbCurrentServerIP" style="display: inline;"></p>';
                 $("#sidebar-status circle").attr("fill", "#1BD137");
                 $("#sidebar-status p").text("Connected!");
             }
@@ -325,6 +306,11 @@ $(() => {
 
     $("#logout").click((e) => {
         setCookie("token", "");
+        setCookie("server", "");
         location.reload();
     });
+
+    setTimeout(() => {
+        Relay.switchServer(getCookie("server"));
+    }, 800);
 });

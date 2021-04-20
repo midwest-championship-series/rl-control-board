@@ -71,7 +71,12 @@ app.post('/login', (req, res) => {
     return res.status(400).end();
 });
 
+/* 
+
+    POST /scenes endpoint no longer needed
+
 app.post('/scenes', (req, res) => {
+    console.log(req.body.token);
     if(req.body.token && validateToken(req.body.token)) {
         // Update .scene file
         if(!req.body.scene || !req.body.scene_data)
@@ -84,7 +89,7 @@ app.post('/scenes', (req, res) => {
             return res.status(200).end();
     }
     return res.status(400).send({status:false,message:'User not authenticated'}).end();
-});
+});*/
 
 app.post('/upload-scene', (req, res) => {
     if(req.body.token && validateToken(req.body.token)) {
@@ -107,12 +112,13 @@ app.post('/upload-scene', (req, res) => {
                     mkdirSync("./uploads");
                 
                 // Only allow zippers
-                if(scene.mimetype === "application/zip") {
+                if(scene.mimetype === "application/zip" || scene.mimetype === "application/x-zip-compressed") {
                     scene.mv('./uploads/' + scene.name);
        
                     // send response
                     return processScene(scene.name.replace(".zip", ""), res);
                 }
+                return res.status(400).send({status:false,message:'Invalid mime type'}).end();
             }
         } catch (err) {
             console.log(err);
