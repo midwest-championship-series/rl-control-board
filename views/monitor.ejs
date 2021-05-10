@@ -51,8 +51,9 @@
         </div>
     </div>
     <div class="panel panel-float panel-pad">
-        <div style="color:white;" id="game-details-live">
-        </div>
+        <h4 style="width:100%;text-align: center;color:#fff;">Relay Health</h4>
+        <canvas id="update-rate-out-chart"></canvas>
+        <canvas id="update-rate-in-chart"></canvas>
     </div>
 </div>
 
@@ -121,6 +122,7 @@
     
     let mCurScenes = [];
     let monitorClients = [];
+    let curRate = {"plugin": 0, "relay": 0};
 
     ServerManager.addListener("status_changed", (data) => {
         if(data["status"] === "INITIALIZED") {
@@ -136,23 +138,7 @@
             })
 
             Relay.socket.on("update state", (match) => {
-                let html = "";
-                let g = match["game"];
-                html += `<p>ballSpeed: ${g["ballSpeed"]}</p>`;
-                html += `<p>ballTeam: ${g["ballTeam"]}</p>`;
-                html += `<p>hasTarget: ${g["hasTarget"]}</p>`;
-                html += `<p>hasWinner: ${g["hasWinner"]}</p>`;
-                html += `<p>isReplay: ${g["isReplay"]}</p>`;
-                html += `<p>target: ${g["target"]}</p>`;
-                html += `<p>time: ${g["time"]}</p>`;
-                html += `<p>winner: ${g["winner"]}</p>`;
-                html += `<p>hasGame: ${g["hasGame"]}</p>`;
-                if(g["homeTeam"] && g["awayTeam"]) {
-                    html += `<p>homeTeamScore: ${g["homeTeam"]["score"]}</p>`;
-                    html += `<p>awayTeamScore: ${g["awayTeam"]["score"]}</p>`;
-                }
-
-                document.getElementById("game-details-live").innerHTML = html;
+                curRate["relay"]++;
             });
 
             Relay.socket.on("scene added", (name) => {
@@ -176,6 +162,38 @@
                 monitorClients = monitorClients.filter(x => x !== name);
                 monitorUpdateOverlays();
             });
+
+            Relay.socket.on("plugin heartbeat", () => {
+                curRate["plugin"]++;
+            });
+
+            setInterval(() => {
+                // Update graph
+                if(updateRateIn && updateRateOut) {
+                    let curDate = new Date();
+                    updateRateOut.data.labels.push(curDate.toLocaleTimeString());
+                    updateRateOut.data.datasets.forEach((dataset) => {
+                        if(dataset.data.length >= 5) {
+                            dataset.data.shift();
+                            updateRateOut.data.labels.shift();
+                        }
+                        dataset.data.push(curRate["relay"]);
+                    });
+                    updateRateIn.data.labels.push(curDate.toLocaleTimeString());
+                    updateRateIn.data.datasets.forEach((dataset) => {
+                        if(dataset.data.length >= 5) {
+                            updateRateIn.data.labels.shift();
+                            dataset.data.shift();
+                        }
+                        dataset.data.push(curRate["plugin"]);
+                    });
+                    updateRateOut.update();
+                    updateRateIn.update();
+                }
+
+                curRate["plugin"] = 0;
+                curRate["relay"] = 0;
+            }, 1000);
         } else if(data["status"] === "CONNECTED") {
             console.log("logged in, getting overlays");
             Relay.socket.emit("get overlays", (overlays) => {
@@ -186,4 +204,72 @@
             });
         }
     })
+
+    let updateRateOut = undefined, updateRateIn = undefined;
+
+    $(() => {
+        updateRateOut = new Chart(document.getElementById('update-rate-out-chart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Update Rate Out',
+                        data: [],
+                        fill: false,
+                        borderColor: '#f90',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 10,
+                            stepValue: 5,
+                            max: 100
+                        }
+                    }]
+                },
+                tooltips: {
+                    enabled: false
+                },
+            }
+        });
+        updateRateIn = new Chart(document.getElementById('update-rate-in-chart'), {
+            type: 'line',
+            showTooltips: false,
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Update Rate In',
+                        data: [],
+                        fill: false,
+                        borderColor: '#f90',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true,
+                            steps: 10,
+                            stepValue: 5,
+                            max: 100
+                        }
+                    }]
+                },
+                tooltips: {
+                    enabled: false
+                },
+            }
+        });
+    });
 </script>
