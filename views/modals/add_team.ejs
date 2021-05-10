@@ -31,15 +31,15 @@
             
             <label class="uk-form-label uk-width-1-1">Team Colors (Hex)</label>
             <div class="uk-width-1-1">
-                <input class="uk-input add-team-colors" name="team-color-hp" type="text" placeholder="Home Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <input oninput="document.getElementById('atpc-hp').style.backgroundColor = this.value;" class="uk-input add-team-colors" name="team-color-hp" type="text" placeholder="Home Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
                 <div id="atpc-hp" class="add-team-preview-color"></div>
-                <input class="uk-input add-team-colors" name="team-color-hs" type="text" placeholder="Home Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <input oninput="document.getElementById('atpc-hs').style.backgroundColor = this.value;" class="uk-input add-team-colors" name="team-color-hs" type="text" placeholder="Home Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
                 <div id="atpc-hs" class="add-team-preview-color"></div>
             </div>
             <div class="uk-width-1-1">
-                <input class="uk-input add-team-colors" name="team-color-ap" type="text" placeholder="Away Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <input oninput="document.getElementById('atpc-ap').style.backgroundColor = this.value;" class="uk-input add-team-colors" name="team-color-ap" type="text" placeholder="Away Primary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
                 <div id="atpc-ap" class="add-team-preview-color"></div>
-                <input class="uk-input add-team-colors" name="team-color-as" type="text" placeholder="Away Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
+                <input oninput="document.getElementById('atpc-as').style.backgroundColor = this.value;" class="uk-input add-team-colors" name="team-color-as" type="text" placeholder="Away Secondary" required pattern="^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$">
                 <div id="atpc-as" class="add-team-preview-color"></div>
             </div>
             <label class="uk-form-label uk-width-1-1">Players</label>
