@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Minnesota Championship Series</title>
+        <title>University of Minnesota</title>
 
         <link rel="stylesheet" href="./css/index.min.css"/>
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -40,14 +40,15 @@
             }
             #logo-path {
                 transition: opacity 2s;
+                stroke: #ffcc33 !important;
             }
             #logo {
                 transition: opacity 1s;
             }
             #login-div {
-                background-color: #ddd;
+                background-color: #7a0019;
                 border: 5px black solid;
-                box-shadow: 0px 0px 15px 4px rgb(108,172,220);
+                box-shadow: 0px 0px 15px 4px #ffcc33;
                 width: 400px;
                 height: 200px;
                 position: absolute;
@@ -57,6 +58,8 @@
                 overflow: hidden;
             }
             #login-content {
+                background-color: #7a0019 !important;
+                color:#ffcc33;
                 width: 980px;
                 height: 200px;
                 transition: transform 0.75s;
@@ -66,6 +69,8 @@
                 flex-direction: row;
             }
             #login-content div {
+                background-color: #7a0019 !important;
+                color:#ffcc33;
                 width: 490px;
                 height: 200px;
             }
@@ -90,7 +95,7 @@
                 padding-left:50%;
                 opacity: 0;
                 background-color: rgb(31, 27, 27);
-                background-image: url("./img/background.svg");
+                background-image: url("./img/umn_background.svg");
                 background-position:right;
                 background-repeat:no-repeat;
                 background-size:cover;
@@ -109,16 +114,16 @@
             </div>
             <div id="login-content">
                 <div id="server-entry" style="background-color:#ccc;display:flex;flex-direction: column;justify-content: center;align-items: center;">
-                    <h3 style="margin-bottom:10px;">Minnesota Championship Series</h3>
-                    <p id="server-error" style="color: red;width:100%;text-align:center;margin: 0;display: none;margin-bottom: 10px;">Server not available.</p>
+                    <h3 style="margin-bottom:10px;color:#ffcc33 !important;">University of Minnesota</h3>
+                    <p id="server-error" style="color: #ffcc33;width:100%;text-align:center;margin: 0;display: none;margin-bottom: 10px;">Server not available.</p>
                     <div style="width:400px;height:initial;">
-                        <input class="uk-input uk-form-width-medium" style="border-top-left-radius: 10px;border-bottom-left-radius:10px;width:70px;margin-right:-5px;color:#fff;background-color:#aaa;border-color:black;padding:0;text-align:center;" type="text" placeholder="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" value="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" id="server-protocol" disabled />
+                        <input class="uk-input uk-form-width-medium" style="border-top-left-radius: 10px;border-bottom-left-radius:10px;width:70px;margin-right:-5px;color:#fff;background-color:#aaa;border-color:black;padding:0;text-align:center;" type="text" placeholder="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" value="http<% if(process.env.NODE_ENV === "production") __append('s') %>://" id="server-protocol" />
                         <input id="server" class="uk-input uk-form-width-medium" style="width:330px;" type="text" placeholder="Relay Server" />
                     </div>
                     <button class="uk-button uk-button-primary" style="width: 90px;margin-left:auto;padding: 0;margin-right: 46px;margin-top: 10px;" onclick="validateServer()">Next ></button>
                 </div>
                 <div id="token-entry" style="background-color:#aaa;display:flex;flex-direction: column;justify-content: center;align-items: center;">
-                    <h3 style="margin-bottom:10px;">Login Token</h3>
+                    <h3 style="margin-bottom:10px;color: #ffcc33">Login Token</h3>
                     <p id="token-error" style="color: red;width:100%;text-align:center;margin: 0;display: none;margin-bottom: 10px;">Token invalid.</p>
                     <div style="width:400px;height:initial;">
                         <input class="uk-input uk-form-width-medium" style="width:400px;" id="token" type="password" placeholder="Token" />
@@ -130,8 +135,8 @@
         </div>
 
         <div class="top" id="logos">
-            <img id="path" src="./img/mncs.svg" width="600" height="600" class="uk-animation-stroke" style="opacity: 1;" uk-svg="stroke-animation: true"> </img>
-            <img id="logo" src="./img/mncs.png" style="opacity: 0;" />
+            <img id="path" src="./img/umn.svg" width="600" height="600" class="uk-animation-stroke" style="opacity: 1;" uk-svg="stroke-animation: true"> </img>
+            <img id="logo" src="./img/umn.png" style="opacity: 0;object-fit:contain" />
         </div>
         <div id="back-svg"></div>
 
