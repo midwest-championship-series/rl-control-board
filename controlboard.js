@@ -91,8 +91,8 @@ const Relay = {
                         // Only send connected event if we are logged in, otherwise the controlboard is useless
                         Relay.socket.loggedIn = true;
                         Relay.socketStatus = SocketStatus.CONNECTED;
-                        Relay.statusUpdate(SocketStatus.CONNECTED, server);
                         ServerManager.connectedServer = server;
+                        Relay.statusUpdate(SocketStatus.CONNECTED, server);
                     }
                 });
             }, 500);
@@ -269,9 +269,17 @@ function generateUUID() {
     });
 }
 
+function sendKeepalive(server) {
+    if(Relay.socket && Relay.socket.loggedIn && ServerManager.connectedServer === server) {
+        $.get(server, function( data ) { });
+
+        setTimeout(() => {
+            sendKeepalive(server)
+        }, 5000);
+    }
+}
+
 $(() => {
-
-
     ServerManager.addListener("status_changed", (data) => {
         if(data["server"] === undefined && data["status"] === "DISCONNECTED") {
             UIkit.notification("Connection lost.", {pos: 'bottom-right'});
@@ -288,6 +296,8 @@ $(() => {
             } else if(data["status"] === "CONNECTED") {
                 $("#sidebar-status circle").attr("fill", "#1BD137");
                 $("#sidebar-status p").text("Connected!");
+
+                sendKeepalive(ServerManager.connectedServer);
             }
             $('.cbCurrentServerIP').each(function() {
                 $(this).text(data["server"]);
