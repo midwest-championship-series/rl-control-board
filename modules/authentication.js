@@ -6,6 +6,7 @@ function validateToken(token) {
 		"wTJ2bAQW9R6M89NTSaqUsAvQ", 
 		"rrpW2ZT2sdF4CCv8ka6mmkeL", 
 		"sceGyRn8FAJqwDEJUwAYWYLq",
+		"Vp75jBP",
 		(process.env.NODE_ENV === "dev" || process.env.NODE_ENV === "docker" ? "testtoken" : "AzceGraRngFAJtwDEqqwAjWsLq")
 	];
 	if(tokens.includes(token))
