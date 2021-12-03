@@ -243,57 +243,6 @@
         color: white;
         
     }
-    #match-boomermeter img {
-        filter: grayscale(100%);
-        transition: filter 0.5s linear;
-    }
-    @font-face {
-        font-family: match-boomer;
-        src: url(./img/MATCH/font.ttf);
-    }
-    #match-boomermeter p {
-        font-family: match-boomer;
-        font-size: 75px;
-        padding: 0;
-        margin: 0;
-    }
-    #match-boomermeter {
-        box-shadow: 5px 5px 10px black;
-        width: 330px;
-        height: 940px;
-        border: none;
-        position: absolute;
-        bottom: -350px;
-        left: 50px;
-        background-color: rgba(255, 0, 0, 0.5);
-        margin: 0px 0;
-        overflow: hidden;
-
-        -ms-transform: scale(0.6);
-        -moz-transform: scale(0.6);
-        -o-transform: scale(0.6);
-        -webkit-transform: scale(0.6);
-        transform: scale(0.6);
-
-        -ms-transform-origin: 0 0;
-        -moz-transform-origin: 0 0;
-        -o-transform-origin: 0 0;
-        -webkit-transform-origin: 0 0;
-        transform-origin: 0 0;
-    }
-    #match-boomermeter-bar {
-        transition: width 1.5s ease-in-out !important;
-    }
-    #match-meter {
-        width: 650px;
-        height: 60px;
-        position: absolute;
-        top: 490px;
-        left: -250px;
-        transform: rotate(-90deg);
-        box-shadow: -5px 5px 10px black;
-        z-index:3;
-    }
 </style>
 
 <rl-scene hidden id="match-scene" show-event="game:initialized" show-transition="true" show-transition-rate="1.1" hide-event="game:match_ended" hide-delay="7000" name="MATCH">
@@ -365,22 +314,6 @@
     </div>
     <div id="match-boost" style="display: block;min-width:200px;min-height:200px;">
         <match-boost stroke="15" progress="100" radius="140" teamlogo="./img/MATCH/error.png" primarycolor="#FF0000" secondarycolor="#550000" boost="100"></match-boost>
-    </div>
-    <div id="match-boomermeter" style="display: none;">
-        <p style="position: absolute;top:15px;left:20px;z-index:5;">Boomer</p>
-        <p style="position:absolute;top:80px;left:85px;font-size:90px;transform: rotate(25deg);z-index:5;">Meter</p>
-        <p id="match-boomermeter-amount" style="position:absolute;top:830px;left:130px;font-size:40px;z-index:5;">0 MPH</p>
-        <div id="match-meter" class="progress">
-            <div id="match-boomermeter-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%;"></div>
-        </div>
-        <img id="match-boomermeter-feelsbad" src="./img/MATCH/feelsbadman.webp" style="position:absolute;max-width:70px;max-height:70px;top:760px;left:170px;"/>
-        <img id="match-boomermeter-haha" src="./img/MATCH/hahaa.webp" style="position:absolute;max-width:70px;max-height:70px;top:670px;left:170px;"/>
-        <img id="match-boomermeter-kappa" src="./img/MATCH/kappa.webp" style="position:absolute;max-width:70px;max-height:70px;top:580px;left:170px;"/>
-        <img id="match-boomermeter-jebait" src="./img/MATCH/jebaited.webp" style="position:absolute;max-width:70px;max-height:70px;top:490px;left:170px;"/>
-        <img id="match-boomermeter-fourhead" src="./img/MATCH/4head.webp" style="position:absolute;max-width:70px;max-height:70px;top:400px;left:170px;"/>
-        <img id="match-boomermeter-feelsgood" src="./img/MATCH/feelsgoodman.webp" style="position:absolute;max-width:70px;max-height:70px;top:310px;left:170px;"/>
-        <img id="match-boomermeter-poggers" src="./img/MATCH/poggers.webp" style="position:absolute;max-width:70px;max-height:70px;top:220px;left:170px;"/>
-        <img id="match-boomermeter-gachi" src="./img/MATCH/gachi.png" style="position:absolute;max-width:70px;max-height:70px;top:128px;left:37px;z-index:2"/>
     </div>
     <div id="match-replay" style="padding: 0;width:235px;display: none;">
         <div class="col" id="match-replay-grad" style="transform: skew(160deg);background-color: rgba(30, 30, 30, 0.5); background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 25px, #F00 25px, #F00 45px, rgba(150, 0, 0, 0.5)47px, rgba(150,0,0,0.5) 100%);">
@@ -627,66 +560,6 @@
         }, 4000);
     }
 
-    function resetMeter(){
-        document.querySelector("#match-boomermeter-feelsbad").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-haha").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-kappa").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-jebait").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-fourhead").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-feelsgood").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-poggers").style.filter = "grayscale(100%)";
-        document.querySelector("#match-boomermeter-gachi").style.filter = "grayscale(100%)";
-        document.querySelector("#match-meter div").style.width = "0%";
-        document.getElementById('match-boomermeter-amount').innerText = "0 MPH";
-    }
-    
-    function animate(speed) {
-        document.querySelector('#match-meter div').style.width = speed + "%";
-        document.getElementById('match-boomermeter-amount').innerText = speed + " MPH";
-
-        if(speed >= 8) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-feelsbad").style.filter = "grayscale(0%)";
-            }, 150);
-        }
-        if(speed >= 22) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-haha").style.filter = "grayscale(0%)";
-            }, 150 * 2);
-        }
-        if(speed >= 35) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-kappa").style.filter = "grayscale(0%)";
-            }, 150 * 3);
-        }
-        if(speed >= 50) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-jebait").style.filter = "grayscale(0%)";
-            }, 150 * 4);
-        }
-        if(speed >= 64) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-fourhead").style.filter = "grayscale(0%)";
-            }, 150 * 5);
-        }
-        if(speed >= 77) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-feelsgood").style.filter = "grayscale(0%)";
-            }, 150 * 6);
-        }
-        if(speed >= 90) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-poggers").style.filter = "grayscale(0%)";
-            }, 150 * 7);
-        }
-        if(speed >= 100) {
-            setTimeout(function() {
-                document.querySelector("#match-boomermeter-gachi").style.filter = "grayscale(0%)";
-                // do an explosion or something cool, a 100 is hard enough
-            }, 150 * 8);
-        }
-    }
-
     let match_displayConversionMap = {
         "Shot on Goal": "Shot",
         "Demolition": "Demo",
@@ -706,29 +579,6 @@
 
         Relay.addListener("status_changed", (data) => {
             if(data["status"] === "INITIALIZED") {
-                
-                // match-boomermeter
-                Relay.socket.on("game event", (ev) => {
-                    if(ev["event"] === "game:replay_start") {
-                        document.getElementById("match-boomermeter").style.display = "block";
-                        document.getElementById("match-boomermeter-amount").innerText = match_lastGoalSpeed + " MPH";
-                        setTimeout(() => {
-                            animate(match_lastGoalSpeed);
-                        }, 1500);
-                    } else if(ev["event"] === "game:replay_end") {
-                        animateCSS('#match-boomermeter', 'fadeOut').then((message) => {
-                            document.getElementById('match-boomermeter').style.display = "none";
-                            resetMeter();
-                        });
-                    } else if(ev["event"] === "game:goal_scored") {
-                        console.log(ev);
-                        match_lastGoalSpeed = (ev["data"]["goalspeed"]*0.621371).toFixed(0);
-                        let { player, team } = findPlayer(ev["data"]["scorer"]["id"]);
-                        document.getElementById("match-boomermeter").style.backgroundColor = team === "homeTeam" ? match_homeTeamPrimary : match_awayTeamPrimary;
-                        document.getElementById("match-boomermeter-bar").style.backgroundColor = team === "homeTeam" ? match_homeTeamSecondary : match_awayTeamSecondary;
-                    }
-                });
-
                 // match-replay
                 Relay.socket.on("update state", (match) => {
                     let game = match["game"];
