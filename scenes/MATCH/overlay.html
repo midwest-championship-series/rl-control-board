@@ -648,7 +648,7 @@
                         document.getElementById("match-details").style.display = "none";
                     } else {
                         document.getElementById('match-details').style.display = "block";
-                        console.log("updating match-details");
+                        // console.log("updating match-details");
                         var clock = (game['isOT'] ? '+' : '') + secondsToTime(game["time"], game["time"] <= 60 && !game["isOT"]);
                         document.getElementById("match-clockp").innerText = clock;
                         document.getElementById("match-gscore").innerText = game["homeTeam"]["score"] + " - " + game["awayTeam"]["score"];
@@ -745,7 +745,7 @@
                         else if(game["isReplay"] || game["hasWinner"])
                             document.getElementById("match-player").style.display = "none";
                         else {
-                            console.log("updating match-player");
+                            // console.log("updating match-player");
                             document.getElementById("match-player").style.display = "block";
                             var { player, team } = findPlayer(game["target"]);
 
